@@ -1,0 +1,1073 @@
+{
+  "sources": [
+    {
+      "id": "src-airline-policy-01",
+      "name": "Airline Official Tariff & Bereavement Policy",
+      "origin": "Air Canada Legal & Tariffs Doc Repository",
+      "owner": "Customer Relations Compliance Team",
+      "classification": "PUBLIC",
+      "permittedPurposes": [
+        "customer_support",
+        "public_faq",
+        "refund_inquiries"
+      ],
+      "qualityScore": 98,
+      "retentionDays": 730,
+      "slaHours": 4,
+      "lastUpdated": "2026-09-15T08:00:00Z",
+      "contentHash": "sha256-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sampleContent": "Official Rule: Bereavement fares must be requested prior to travel completion. Retroactive bereavement fare refunds are NOT permitted under Rule 4.2."
+    },
+    {
+      "id": "src-crm-customers-02",
+      "name": "Enterprise CRM Customers & Accounts",
+      "origin": "Salesforce CRM Production Replica",
+      "owner": "Sales Operations Data Owner",
+      "classification": "CONFIDENTIAL",
+      "permittedPurposes": [
+        "sales_analytics",
+        "customer_support",
+        "lead_routing"
+      ],
+      "qualityScore": 94,
+      "retentionDays": 1825,
+      "slaHours": 1,
+      "lastUpdated": "2026-10-27T10:30:00Z",
+      "contentHash": "sha256-4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a"
+    },
+    {
+      "id": "src-fin-ledger-03",
+      "name": "Financial Ledger & Bank Accounts",
+      "origin": "SAP ERP S/4HANA Finance Module",
+      "owner": "Chief Financial Officer & Treasury",
+      "classification": "RESTRICTED",
+      "permittedPurposes": [
+        "treasury_reconciliation",
+        "approved_payouts"
+      ],
+      "qualityScore": 100,
+      "retentionDays": 3650,
+      "slaHours": 0.5,
+      "lastUpdated": "2026-10-28T09:00:00Z",
+      "contentHash": "sha256-ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d"
+    },
+    {
+      "id": "src-codebase-intel-04",
+      "name": "Proprietary Semiconductor & Algorithm Codebase",
+      "origin": "Git Enterprise Internal Monorepo (Samsung Tech)",
+      "owner": "R&D Security Committee",
+      "classification": "RESTRICTED",
+      "permittedPurposes": [
+        "internal_code_review",
+        "automated_linting"
+      ],
+      "qualityScore": 96,
+      "retentionDays": 1095,
+      "slaHours": 2,
+      "lastUpdated": "2026-10-26T16:45:00Z",
+      "contentHash": "sha256-ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    },
+    {
+      "id": "src-property-val-05",
+      "name": "Real Estate Valuation Models & Market Indices",
+      "origin": "Automated Valuation Model (Zillow Engine)",
+      "owner": "Risk & Algorithmic Trading Group",
+      "classification": "INTERNAL",
+      "permittedPurposes": [
+        "housing_estimates",
+        "risk_assessment"
+      ],
+      "qualityScore": 91,
+      "retentionDays": 1460,
+      "slaHours": 6,
+      "lastUpdated": "2026-10-28T06:15:00Z",
+      "contentHash": "sha256-ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+    }
+  ],
+  "agents": [
+    {
+      "id": "agent-airline-support-01",
+      "name": "Air Canada Customer Support Assistant",
+      "technicalIdentity": "agent-svc-airline-faq",
+      "systemOwner": "VP Customer Experience",
+      "processOwner": "Passenger Rights & Helpdesk Director",
+      "riskTier": "MEDIUM",
+      "scopes": [
+        "support:read_policy",
+        "support:answer_inquiry"
+      ],
+      "allowedDataSources": [
+        "src-airline-policy-01"
+      ],
+      "allowedTools": [
+        "airline.lookup_fare_rules",
+        "airline.check_ticket_status"
+      ],
+      "environment": "production",
+      "apiKey": "aegis_live_aircan_key_9941a7c",
+      "tokenExpiresAt": "2027-01-01T00:00:00Z",
+      "killSwitchActive": false,
+      "createdAt": "2026-01-10T12:00:00Z"
+    },
+    {
+      "id": "agent-fin-treasury-02",
+      "name": "Autonomous Treasury & Payment Reconciler",
+      "technicalIdentity": "agent-svc-sap-treasury",
+      "systemOwner": "Corporate Comptroller",
+      "processOwner": "Head of Treasury Operations",
+      "riskTier": "CRITICAL",
+      "scopes": [
+        "erp:read_orders",
+        "erp:create_payment",
+        "financial:transfer_funds"
+      ],
+      "allowedDataSources": [
+        "src-fin-ledger-03",
+        "src-crm-customers-02"
+      ],
+      "allowedTools": [
+        "erp.create_payment",
+        "financial.transfer_funds",
+        "erp.read_orders"
+      ],
+      "environment": "production",
+      "apiKey": "aegis_live_fin_key_7718be8",
+      "tokenExpiresAt": "2026-12-31T23:59:59Z",
+      "killSwitchActive": false,
+      "createdAt": "2026-02-14T09:30:00Z"
+    },
+    {
+      "id": "agent-replit-coder-03",
+      "name": "SaaS DevOps & Migration Agent (SaaStr Case)",
+      "technicalIdentity": "agent-svc-devops-executor",
+      "systemOwner": "Director of Infrastructure",
+      "processOwner": "Lead DevOps Architect",
+      "riskTier": "HIGH",
+      "scopes": [
+        "db:read_replica",
+        "db:execute_migration",
+        "infra:provision"
+      ],
+      "allowedDataSources": [
+        "src-codebase-intel-04"
+      ],
+      "allowedTools": [
+        "db.execute_migration",
+        "db.execute_query",
+        "infra.restart_service"
+      ],
+      "environment": "sandbox",
+      "apiKey": "aegis_sandbox_devops_key_1192e4a",
+      "tokenExpiresAt": "2026-11-30T00:00:00Z",
+      "killSwitchActive": false,
+      "createdAt": "2026-03-01T15:20:00Z"
+    },
+    {
+      "id": "agent-samsung-copilot-04",
+      "name": "Semiconductor Engineering Copilot",
+      "technicalIdentity": "agent-svc-eng-assistant",
+      "systemOwner": "Chief Technology Officer",
+      "processOwner": "Hardware Architecture Group",
+      "riskTier": "MEDIUM",
+      "scopes": [
+        "code:read_internal",
+        "code:propose_refactor"
+      ],
+      "allowedDataSources": [
+        "src-codebase-intel-04"
+      ],
+      "allowedTools": [
+        "code.summarize",
+        "code.run_tests"
+      ],
+      "environment": "production",
+      "apiKey": "aegis_live_samsung_copilot_5501fa3",
+      "tokenExpiresAt": "2026-12-31T00:00:00Z",
+      "killSwitchActive": false,
+      "createdAt": "2026-03-10T11:00:00Z"
+    }
+  ],
+  "policies": [
+    {
+      "id": "pol-crm-read",
+      "system": "CRM",
+      "toolName": "crm.read_customer",
+      "description": "Read assigned customer fields with field-level masking of PII",
+      "riskLevel": "LOW",
+      "requiresApproval": false,
+      "dualApprovalRequired": false,
+      "disallowedInProduction": false,
+      "allowedParameters": [
+        "customerId",
+        "fields"
+      ],
+      "rateLimitPerMinute": 60
+    },
+    {
+      "id": "pol-crm-export",
+      "system": "CRM",
+      "toolName": "crm.export_customers",
+      "description": "Bulk customer export. Limited to 100 rows per call to prevent data exfiltration",
+      "riskLevel": "HIGH",
+      "requiresApproval": true,
+      "dualApprovalRequired": false,
+      "disallowedInProduction": false,
+      "allowedParameters": [
+        "segment",
+        "limit",
+        "format"
+      ],
+      "rateLimitPerMinute": 5
+    },
+    {
+      "id": "pol-erp-read-orders",
+      "system": "ERP",
+      "toolName": "erp.read_orders",
+      "description": "Query status of orders and vendor invoices (financial data minimized)",
+      "riskLevel": "LOW",
+      "requiresApproval": false,
+      "dualApprovalRequired": false,
+      "disallowedInProduction": false,
+      "allowedParameters": [
+        "orderId",
+        "vendorId"
+      ],
+      "rateLimitPerMinute": 120
+    },
+    {
+      "id": "pol-erp-payment",
+      "system": "ERP",
+      "toolName": "erp.create_payment",
+      "description": "Create outgoing vendor disbursement or purchase approval",
+      "riskLevel": "CRITICAL",
+      "requiresApproval": true,
+      "dualApprovalRequired": true,
+      "maxMonetaryLimit": 50000,
+      "disallowedInProduction": false,
+      "allowedParameters": [
+        "vendorId",
+        "amount",
+        "currency",
+        "invoiceId",
+        "memo"
+      ],
+      "rateLimitPerMinute": 10
+    },
+    {
+      "id": "pol-fin-transfer",
+      "system": "Financial APIs",
+      "toolName": "financial.transfer_funds",
+      "description": "Direct wire or ACH bank transfer. Strict vault secrets, idempotency & human approval",
+      "riskLevel": "CRITICAL",
+      "requiresApproval": true,
+      "dualApprovalRequired": true,
+      "maxMonetaryLimit": 10000,
+      "disallowedInProduction": false,
+      "allowedParameters": [
+        "recipientIban",
+        "amount",
+        "currency",
+        "idempotencyKey"
+      ],
+      "rateLimitPerMinute": 2
+    },
+    {
+      "id": "pol-db-write",
+      "system": "Production Database",
+      "toolName": "db.execute_migration",
+      "description": "Execute DDL, UPDATE, or DELETE on database. Disallowed on production by default",
+      "riskLevel": "CRITICAL",
+      "requiresApproval": true,
+      "dualApprovalRequired": false,
+      "disallowedInProduction": true,
+      "allowedParameters": [
+        "sqlStatement",
+        "targetSchema",
+        "rollbackSql"
+      ],
+      "rateLimitPerMinute": 2
+    },
+    {
+      "id": "pol-email-send",
+      "system": "Email System",
+      "toolName": "email.send_external",
+      "description": "Dispatch external emails to customers or vendors. Prevents unauthorized broadcasts",
+      "riskLevel": "HIGH",
+      "requiresApproval": true,
+      "dualApprovalRequired": false,
+      "disallowedInProduction": false,
+      "allowedParameters": [
+        "recipientEmail",
+        "subject",
+        "body"
+      ],
+      "rateLimitPerMinute": 20
+    }
+  ],
+  "approvals": [
+    {
+      "id": "appr-1793192150227-71e138",
+      "correlationId": "corr-action-1793192150226-9c41a920",
+      "agentId": "agent-fin-treasury-02",
+      "agentName": "Autonomous Treasury & Payment Reconciler",
+      "toolName": "financial.transfer_funds",
+      "parameters": {
+        "recipientIban": "GB82WEST12345678901234",
+        "amount": 8500,
+        "currency": "USD",
+        "idempotencyKey": "tx-5070"
+      },
+      "riskLevel": "CRITICAL",
+      "status": "APPROVED",
+      "requestedAt": "2026-10-28T12:55:50.227Z",
+      "system": "Financial APIs",
+      "environment": "production",
+      "decidedAt": "2026-10-28T12:56:25.337Z",
+      "decidedBy": "sarah.connor@enterprise.com",
+      "decisionRationale": "Reviewed risk parameters and verified with process owner."
+    },
+    {
+      "id": "appr-1793191448502-d4fb3c",
+      "correlationId": "corr-action-1793191448502-08cd3dbb",
+      "agentId": "agent-fin-treasury-02",
+      "agentName": "Autonomous Treasury & Payment Reconciler",
+      "toolName": "financial.transfer_funds",
+      "parameters": {
+        "recipientIban": "GB82WEST12345678901234",
+        "amount": 8500,
+        "currency": "USD"
+      },
+      "riskLevel": "CRITICAL",
+      "status": "PENDING",
+      "requestedAt": "2026-10-28T12:44:08.502Z",
+      "system": "Financial APIs",
+      "environment": "production"
+    },
+    {
+      "id": "appr-1793191169846-02fdd3",
+      "correlationId": "corr-action-1793191169846-88e0fb17",
+      "agentId": "agent-fin-treasury-02",
+      "agentName": "Autonomous Treasury & Payment Reconciler",
+      "toolName": "financial.transfer_funds",
+      "parameters": {
+        "amount": 8500,
+        "currency": "USD",
+        "recipientIban": "GB82WEST12345678901234"
+      },
+      "riskLevel": "CRITICAL",
+      "status": "PENDING",
+      "requestedAt": "2026-10-28T12:39:29.846Z",
+      "system": "Financial APIs",
+      "environment": "production"
+    }
+  ],
+  "auditRecords": [
+    {
+      "correlationId": "corr-action-1793192150226-9c41a920",
+      "timestamp": "2026-10-28T12:56:25.337Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "approval-decision",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "technicalIdentity": "human-governance-officer",
+        "scopesChecked": [
+          "governance:authorize_action"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 10,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "financial.transfer_funds",
+        "model": "human-officer-decision",
+        "groundedSources": [],
+        "riskScore": 90,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "APPROVED",
+        "approvedBy": "sarah.connor@enterprise.com",
+        "rationale": "Reviewed risk parameters and verified with process owner."
+      },
+      "executionEvidence": {
+        "status": "SUCCESS",
+        "latencyMs": 120,
+        "outputSummary": "APPROVED by sarah.connor@enterprise.com: Reviewed risk parameters and verified with process owner.",
+        "reversible": false
+      },
+      "signatureHash": "5e156b47c0ff78d1b4d08699da1c38d08597cd52c099e006f17083c56773b229",
+      "previousHash": "dde50a9d46b62464323d09b309ab4fc8f91e4c9469f66e02ef00ce9531dc2084"
+    },
+    {
+      "correlationId": "corr-action-1793192150226-9c41a920",
+      "timestamp": "2026-10-28T12:55:50.227Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "action-request",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "technicalIdentity": "agent-svc-sap-treasury",
+        "scopesChecked": [
+          "erp:read_orders",
+          "erp:create_payment",
+          "financial:transfer_funds"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 20,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "financial.transfer_funds",
+        "model": "aegis-policy-engine-v2",
+        "groundedSources": [],
+        "riskScore": 95,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "PENDING",
+        "policyRuleId": "pol-fin-transfer",
+        "rationale": "Action requires human authorization: Direct wire or ACH bank transfer. Strict vault secrets, idempotency & human approval"
+      },
+      "executionEvidence": {
+        "status": "PENDING_APPROVAL",
+        "latencyMs": 1,
+        "outputSummary": "Awaiting authorization ticket appr-1793192150227-71e138",
+        "reversible": true
+      },
+      "signatureHash": "dde50a9d46b62464323d09b309ab4fc8f91e4c9469f66e02ef00ce9531dc2084",
+      "previousHash": "2229166a008ccb075a099b17c6d406f8f7d4a136d29255edb80b580b1cfb255c"
+    },
+    {
+      "correlationId": "corr-prompt-1793192122231-54829430",
+      "timestamp": "2026-10-28T12:55:22.232Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [
+          "src-airline-policy-01"
+        ],
+        "hash": "3f0017eea9c1d6e060661cc05fa7652fdff455c36342e0bfc3b02584ec0ad611",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 1
+      },
+      "identityEvidence": {
+        "agentId": "agent-airline-support-01",
+        "technicalIdentity": "agent-svc-airline-faq",
+        "scopesChecked": [
+          "support:read_policy",
+          "support:answer_inquiry"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 30,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "PROMPT",
+        "model": "claude-3-5-sonnet",
+        "groundedSources": [
+          "Airline Official Tariff & Bereavement Policy"
+        ],
+        "riskScore": 15,
+        "riskTier": "LOW"
+      },
+      "approvalEvidence": {
+        "required": false,
+        "status": "AUTO_APPROVED",
+        "rationale": "Read-only contextual prompt with compliant grounded sources."
+      },
+      "executionEvidence": {
+        "status": "SUCCESS",
+        "latencyMs": 1,
+        "outputSummary": "According to official Airline Tariff Rule 4.2: Bereavement fares must be request...",
+        "reversible": true
+      },
+      "signatureHash": "2229166a008ccb075a099b17c6d406f8f7d4a136d29255edb80b580b1cfb255c",
+      "previousHash": "ac06bcfb44f06541ea9f7b6376ad16155a83e0879a0b3165bf179b884f89ce90"
+    },
+    {
+      "correlationId": "corr-action-1793191448502-08cd3dbb",
+      "timestamp": "2026-10-28T12:44:08.502Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "action-request",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "technicalIdentity": "agent-svc-sap-treasury",
+        "scopesChecked": [
+          "erp:read_orders",
+          "erp:create_payment",
+          "financial:transfer_funds"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 20,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "financial.transfer_funds",
+        "model": "aegis-policy-engine-v2",
+        "groundedSources": [],
+        "riskScore": 95,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "PENDING",
+        "policyRuleId": "pol-fin-transfer",
+        "rationale": "Action requires human authorization: Direct wire or ACH bank transfer. Strict vault secrets, idempotency & human approval"
+      },
+      "executionEvidence": {
+        "status": "PENDING_APPROVAL",
+        "latencyMs": 0,
+        "outputSummary": "Awaiting authorization ticket appr-1793191448502-d4fb3c",
+        "reversible": true
+      },
+      "signatureHash": "ac06bcfb44f06541ea9f7b6376ad16155a83e0879a0b3165bf179b884f89ce90",
+      "previousHash": "5c92ebcd46c5609a71442fc9de4bf221b5f0b962aff2ac12c6b3180eeb618f66"
+    },
+    {
+      "correlationId": "corr-prompt-1793191448500-c3e845ab",
+      "timestamp": "2026-10-28T12:44:08.500Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [
+          "src-airline-policy-01"
+        ],
+        "hash": "3f0017eea9c1d6e060661cc05fa7652fdff455c36342e0bfc3b02584ec0ad611",
+        "freshnessVerified": true,
+        "dlpTriggered": true,
+        "sourcesCount": 1
+      },
+      "identityEvidence": {
+        "agentId": "agent-airline-support-01",
+        "technicalIdentity": "agent-svc-airline-faq",
+        "scopesChecked": [
+          "support:read_policy",
+          "support:answer_inquiry"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 22,
+        "dlpSanitized": true,
+        "redactedTokensCount": 1,
+        "entitiesDetected": [
+          "Email Address"
+        ]
+      },
+      "decisionEvidence": {
+        "actionType": "PROMPT",
+        "model": "claude-3-5-sonnet",
+        "groundedSources": [
+          "Airline Official Tariff & Bereavement Policy"
+        ],
+        "riskScore": 65,
+        "riskTier": "MEDIUM"
+      },
+      "approvalEvidence": {
+        "required": false,
+        "status": "AUTO_APPROVED",
+        "rationale": "Read-only contextual prompt with compliant grounded sources."
+      },
+      "executionEvidence": {
+        "status": "SUCCESS",
+        "latencyMs": 0,
+        "outputSummary": "Request processed safely. Sanitized contextual query dispatched to model....",
+        "reversible": true
+      },
+      "signatureHash": "5c92ebcd46c5609a71442fc9de4bf221b5f0b962aff2ac12c6b3180eeb618f66",
+      "previousHash": "358c4903079c3b0eeea4f354442e0efadaaae1b5120f0aea15bb31ce0b23effa"
+    },
+    {
+      "correlationId": "corr-prompt-1793191448497-a95bb9bf",
+      "timestamp": "2026-10-28T12:44:08.497Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [
+          "src-airline-policy-01"
+        ],
+        "hash": "3f0017eea9c1d6e060661cc05fa7652fdff455c36342e0bfc3b02584ec0ad611",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 1
+      },
+      "identityEvidence": {
+        "agentId": "agent-airline-support-01",
+        "technicalIdentity": "agent-svc-airline-faq",
+        "scopesChecked": [
+          "support:read_policy",
+          "support:answer_inquiry"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 18,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "PROMPT",
+        "model": "claude-3-5-sonnet",
+        "groundedSources": [
+          "Airline Official Tariff & Bereavement Policy"
+        ],
+        "riskScore": 15,
+        "riskTier": "LOW"
+      },
+      "approvalEvidence": {
+        "required": false,
+        "status": "AUTO_APPROVED",
+        "rationale": "Read-only contextual prompt with compliant grounded sources."
+      },
+      "executionEvidence": {
+        "status": "SUCCESS",
+        "latencyMs": 0,
+        "outputSummary": "According to official Airline Tariff Rule 4.2: Bereavement fares must be request...",
+        "reversible": true
+      },
+      "signatureHash": "358c4903079c3b0eeea4f354442e0efadaaae1b5120f0aea15bb31ce0b23effa",
+      "previousHash": "c9a9ff43b2558b9a29ccdb7cb0aea4aa4cf4d36742bddffad7847f4f0be9e11d"
+    },
+    {
+      "correlationId": "corr-action-1793191187516-76d2f965",
+      "timestamp": "2026-10-28T12:39:47.516Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "blocked",
+        "freshnessVerified": false,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-replit-coder-03",
+        "technicalIdentity": "blocked-subject",
+        "scopesChecked": [],
+        "killSwitchActive": true,
+        "isAuthorized": false
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 0,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "db.execute_migration",
+        "model": "aegis-security-barrier",
+        "groundedSources": [],
+        "riskScore": 100,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "REJECTED",
+        "rationale": "Policy Violation: Action 'db.execute_migration' is strictly prohibited in PRODUCTION environments. Must be run in SANDBOX."
+      },
+      "executionEvidence": {
+        "status": "BLOCKED",
+        "latencyMs": 5,
+        "outputSummary": "Policy Violation: Action 'db.execute_migration' is strictly prohibited in PRODUCTION environments. Must be run in SANDBOX.",
+        "reversible": true
+      },
+      "signatureHash": "c9a9ff43b2558b9a29ccdb7cb0aea4aa4cf4d36742bddffad7847f4f0be9e11d",
+      "previousHash": "2f84b5b12002c1c051360a8be4840195e735fe37ff291351e794759f5d1821fd"
+    },
+    {
+      "correlationId": "corr-action-1793191169846-88e0fb17",
+      "timestamp": "2026-10-28T12:39:29.846Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "action-request",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "technicalIdentity": "agent-svc-sap-treasury",
+        "scopesChecked": [
+          "erp:read_orders",
+          "erp:create_payment",
+          "financial:transfer_funds"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 20,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "financial.transfer_funds",
+        "model": "aegis-policy-engine-v2",
+        "groundedSources": [],
+        "riskScore": 95,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "PENDING",
+        "policyRuleId": "pol-fin-transfer",
+        "rationale": "Action requires human authorization: Direct wire or ACH bank transfer. Strict vault secrets, idempotency & human approval"
+      },
+      "executionEvidence": {
+        "status": "PENDING_APPROVAL",
+        "latencyMs": 0,
+        "outputSummary": "Awaiting authorization ticket appr-1793191169846-02fdd3",
+        "reversible": true
+      },
+      "signatureHash": "2f84b5b12002c1c051360a8be4840195e735fe37ff291351e794759f5d1821fd",
+      "previousHash": "6facbe6aed1817b8c17c53c811cf0848942f7734141541f462a0411afd288761"
+    },
+    {
+      "correlationId": "corr-prompt-1793191157342-653b4d74",
+      "timestamp": "2026-10-28T12:39:17.342Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [
+          "src-airline-policy-01"
+        ],
+        "hash": "3f0017eea9c1d6e060661cc05fa7652fdff455c36342e0bfc3b02584ec0ad611",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 1
+      },
+      "identityEvidence": {
+        "agentId": "agent-airline-support-01",
+        "technicalIdentity": "agent-svc-airline-faq",
+        "scopesChecked": [
+          "support:read_policy",
+          "support:answer_inquiry"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 15,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "PROMPT",
+        "model": "claude-3-5-sonnet",
+        "groundedSources": [
+          "Airline Official Tariff & Bereavement Policy"
+        ],
+        "riskScore": 15,
+        "riskTier": "LOW"
+      },
+      "approvalEvidence": {
+        "required": false,
+        "status": "AUTO_APPROVED",
+        "rationale": "Read-only contextual prompt with compliant grounded sources."
+      },
+      "executionEvidence": {
+        "status": "SUCCESS",
+        "latencyMs": 0,
+        "outputSummary": "According to official Airline Tariff Rule 4.2: Bereavement fares must be request...",
+        "reversible": true
+      },
+      "signatureHash": "6facbe6aed1817b8c17c53c811cf0848942f7734141541f462a0411afd288761",
+      "previousHash": "GENESIS_BLOCK_00000000000000000000"
+    }
+  ],
+  "maturityControls": [
+    {
+      "id": 1,
+      "dimension": "Data",
+      "controlName": "Data Source & Owner Inventory",
+      "description": "An authoritative catalog of data sources, schemas, and assigned data owners exists.",
+      "isoReference": "ISO/IEC 42001:2023 Cl. 6.1.2 & Annex A.6",
+      "status": "YES",
+      "remediationGuidance": "Ensure all newly connected vector databases and CRM replicas register an active data owner."
+    },
+    {
+      "id": 2,
+      "dimension": "Data",
+      "controlName": "Data Classification by Sensitivity & Purpose",
+      "description": "Data sets are tagged with sensitivity levels (Public/Internal/Confidential/Restricted) and purpose limitations.",
+      "isoReference": "ISO/IEC 42001:2023 Cl. 8.2 & GDPR Art. 5(1)(b)",
+      "status": "YES",
+      "remediationGuidance": "Verify that DLP checks enforce classification tags at the prompt injection stage."
+    },
+    {
+      "id": 3,
+      "dimension": "Data",
+      "controlName": "Lineage & Freshness Verification",
+      "description": "Provenance, content hash, transformation history, and freshness timestamps are tracked.",
+      "isoReference": "DAMA-DMBOK Ch. 13 & NIST AI RMF Map 1.5",
+      "status": "YES",
+      "remediationGuidance": "Reject RAG chunks whose freshness exceeds SLA without human escalation."
+    },
+    {
+      "id": 4,
+      "dimension": "Data",
+      "controlName": "Quality, Retention & Deletion Lifecycle",
+      "description": "Data retention periods, quality scoring metrics, and safe disposal policies are enforced.",
+      "isoReference": "ISO/IEC 42001 Cl. A.6.3 & GDPR Art. 5(1)(e)",
+      "status": "PARTIAL",
+      "remediationGuidance": "Automate weekly purging of intermediate scratch embeddings beyond the 90-day window."
+    },
+    {
+      "id": 5,
+      "dimension": "Agents & Access",
+      "controlName": "Unique Technical Identity per Agent",
+      "description": "Agents use dedicated technical service identities, never inheriting raw end-user credentials.",
+      "isoReference": "ISO/IEC 42001 Cl. A.7.2 & NIST AI RMF Govern 1.2",
+      "status": "YES",
+      "remediationGuidance": "Audit token issuance to guarantee agents cannot impersonate human executives."
+    },
+    {
+      "id": 6,
+      "dimension": "Agents & Access",
+      "controlName": "Least Privilege & Expiring Credentials",
+      "description": "Permissions are scoped per task, resource, and time window with automatic credential rotation.",
+      "isoReference": "ISO/IEC 42001 Cl. A.7.3 & Zero Trust Architecture",
+      "status": "YES",
+      "remediationGuidance": "Configure token TTL to a maximum of 24 hours for autonomous background workers."
+    },
+    {
+      "id": 7,
+      "dimension": "Agents & Access",
+      "controlName": "Approved Tool Gateway & Parameter Validation",
+      "description": "Tool executions route through a gateway that checks schemas, whitelists, and rate limits.",
+      "isoReference": "ISO/IEC 42001 Cl. A.8.4 & OWASP Top 10 for LLM",
+      "status": "YES",
+      "remediationGuidance": "Block direct external HTTP sockets from inside LLM execution containers."
+    },
+    {
+      "id": 8,
+      "dimension": "Agents & Access",
+      "controlName": "Human-in-the-Loop for High/Critical Actions",
+      "description": "Irreversible or high-consequence operations require human approval outside the model.",
+      "isoReference": "EU AI Act Art. 14 & ISO/IEC 42001 Cl. A.9.4",
+      "status": "YES",
+      "remediationGuidance": "Enforce two-person dual authorization for transactions exceeding $10,000."
+    },
+    {
+      "id": 9,
+      "dimension": "Evidence",
+      "controlName": "Grounded Source & Model Version Logging",
+      "description": "Prompts, grounded source references, model versions, and response metadata are recorded.",
+      "isoReference": "EU AI Act Art. 12 & ISO/IEC 42001 Cl. 9.1",
+      "status": "YES",
+      "remediationGuidance": "Store cryptographic hashes of reference materials alongside generated text."
+    },
+    {
+      "id": 10,
+      "dimension": "Evidence",
+      "controlName": "Tool Invocations & Outcome Tracing",
+      "description": "All tool calls, arguments, status codes, and reversal payloads are logged.",
+      "isoReference": "ISO/IEC 42001 Cl. A.9.2",
+      "status": "YES",
+      "remediationGuidance": "Ensure structured JSON parameters are preserved in execution logs."
+    },
+    {
+      "id": 11,
+      "dimension": "Evidence",
+      "controlName": "Protected Logs with Secret Redaction (DLP)",
+      "description": "Audit logs have restricted access, defined retention, and automated PII/secret scrubbing.",
+      "isoReference": "GDPR Art. 32 & ISO/IEC 27001 Cl. A.12.4",
+      "status": "YES",
+      "remediationGuidance": "Run DLP regex filter on audit output before writing to immutable storage."
+    },
+    {
+      "id": 12,
+      "dimension": "Evidence",
+      "controlName": "Correlated Incident Reconstruction",
+      "description": "Every interaction carries a unique correlation ID to rebuild the entire decision chain.",
+      "isoReference": "ISO/IEC 42001 Cl. 9.2 & NIST AI RMF Manage 2.4",
+      "status": "YES",
+      "remediationGuidance": "Validate that correlation IDs span across source retrieval, LLM call, and tool execution."
+    },
+    {
+      "id": 13,
+      "dimension": "Responsibility",
+      "controlName": "Assigned Business & Technical Owners",
+      "description": "Each AI system has a named business process owner and a technical platform owner.",
+      "isoReference": "ISO/IEC 42001 Cl. 5.3",
+      "status": "YES",
+      "remediationGuidance": "Review ownership roster during quarterly AI governance board meetings."
+    },
+    {
+      "id": 14,
+      "dimension": "Responsibility",
+      "controlName": "Pre-Deployment Risk Assessment",
+      "description": "Formal risk assessments (impact, reversibility, bias, safety) are conducted prior to production.",
+      "isoReference": "ISO/IEC 42001 Cl. 6.1.2 & EU AI Act Art. 9",
+      "status": "PARTIAL",
+      "remediationGuidance": "Standardize adversarial red-teaming checklist for all customer-facing agents."
+    },
+    {
+      "id": 15,
+      "dimension": "Responsibility",
+      "controlName": "User Transparency & Escalation Channels",
+      "description": "End users are notified of AI interaction and provided clear human escalation pathways.",
+      "isoReference": "EU AI Act Art. 50 & ISO/IEC 42001 Cl. 7.4",
+      "status": "YES",
+      "remediationGuidance": "Display prominent disclaimers and immediate fallback button in chat widgets."
+    },
+    {
+      "id": 16,
+      "dimension": "Responsibility",
+      "controlName": "Incident Response & Rollback Procedures",
+      "description": "Documented playbook for AI anomalies, automated rollback, and rapid containment.",
+      "isoReference": "NIST AI RMF Manage 3.1 & ISO/IEC 42001 Cl. 10.1",
+      "status": "PARTIAL",
+      "remediationGuidance": "Test the 1-click Agent Kill Switch monthly with simulated rogue tool requests."
+    },
+    {
+      "id": 17,
+      "dimension": "Scale",
+      "controlName": "Periodic Regression & Evaluation Suites",
+      "description": "Continuous benchmarking against golden datasets to detect performance drift.",
+      "isoReference": "ISO/IEC 42001 Cl. 9.1 & NIST AI RMF Measure 2.1",
+      "status": "PARTIAL",
+      "remediationGuidance": "Run weekly automated evaluation of retrieval precision against legal policies."
+    },
+    {
+      "id": 18,
+      "dimension": "Scale",
+      "controlName": "Real-Time Monitoring of Failures & Anomalies",
+      "description": "Telemetry captures tool failure spikes, refusal rates, and latency anomalies.",
+      "isoReference": "ISO/IEC 42001 Cl. 9.1",
+      "status": "YES",
+      "remediationGuidance": "Alert on-call engineers if tool rejection rate exceeds 5% in a 15-minute window."
+    },
+    {
+      "id": 19,
+      "dimension": "Scale",
+      "controlName": "Periodic Access & Scope Reviews",
+      "description": "Periodic re-certification of agent scopes and database connection credentials.",
+      "isoReference": "ISO/IEC 42001 Cl. A.7.4",
+      "status": "PARTIAL",
+      "remediationGuidance": "Automate 90-day scope expiration prompting system owners to re-authorize."
+    },
+    {
+      "id": 20,
+      "dimension": "Scale",
+      "controlName": "Safe Retirement & Decommissioning Process",
+      "description": "Formal checklist for retiring models: revoking keys, purging memory, archiving logs.",
+      "isoReference": "ISO/IEC 42001 Cl. A.8.5 & GDPR Right to be Forgotten",
+      "status": "YES",
+      "remediationGuidance": "Verify that retired agent API keys immediately yield HTTP 403 Forbidden."
+    }
+  ],
+  "raciMatrix": [
+    {
+      "activity": "Classify sources & define quality standards",
+      "data": "A/R",
+      "security": "C",
+      "itPlatform": "C",
+      "business": "C",
+      "legalCompliance": "I"
+    },
+    {
+      "activity": "Define technical identity & access scopes",
+      "data": "C",
+      "security": "A",
+      "itPlatform": "R",
+      "business": "C",
+      "legalCompliance": "I"
+    },
+    {
+      "activity": "Approve AI use case & risk tiering",
+      "data": "C",
+      "security": "C",
+      "itPlatform": "C",
+      "business": "A/R",
+      "legalCompliance": "C"
+    },
+    {
+      "activity": "Design audit logs, DLP & retention rules",
+      "data": "C",
+      "security": "A",
+      "itPlatform": "R",
+      "business": "C",
+      "legalCompliance": "C"
+    },
+    {
+      "activity": "Validate model & conduct regression tests",
+      "data": "C",
+      "security": "C",
+      "itPlatform": "R",
+      "business": "A",
+      "legalCompliance": "C"
+    },
+    {
+      "activity": "Authorize high-impact & critical actions",
+      "data": "I",
+      "security": "C",
+      "itPlatform": "R",
+      "business": "A",
+      "legalCompliance": "C"
+    },
+    {
+      "activity": "Manage AI incidents & regulatory notice",
+      "data": "C",
+      "security": "R",
+      "itPlatform": "R",
+      "business": "A",
+      "legalCompliance": "C"
+    },
+    {
+      "activity": "Quarterly governance review & improvement",
+      "data": "C",
+      "security": "C",
+      "itPlatform": "R",
+      "business": "A",
+      "legalCompliance": "C"
+    }
+  ],
+  "globalKillSwitch": false
+}
