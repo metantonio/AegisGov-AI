@@ -5,6 +5,7 @@ import { cryptoService } from '../services/CryptoService.js';
 import {
   DataSource,
   AgentIdentity,
+  AIModel,
   ActionPolicy,
   ApprovalRequest,
   EvidenceAuditRecord,
@@ -15,6 +16,7 @@ import {
 interface DatabaseSchema {
   sources: DataSource[];
   agents: AgentIdentity[];
+  models: AIModel[];
   policies: ActionPolicy[];
   approvals: ApprovalRequest[];
   auditRecords: EvidenceAuditRecord[];
@@ -23,8 +25,17 @@ interface DatabaseSchema {
   globalKillSwitch: boolean;
 }
 
-const DATA_DIR = path.resolve(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'governance_data.json');
+const resolveDataFile = (): { dir: string; file: string } => {
+  const serverDataDir = path.resolve(process.cwd(), 'server', 'data');
+  const rootDataDir = path.resolve(process.cwd(), 'data');
+
+  if (fs.existsSync(path.join(serverDataDir, 'governance_data.json'))) {
+    return { dir: serverDataDir, file: path.join(serverDataDir, 'governance_data.json') };
+  }
+  return { dir: rootDataDir, file: path.join(rootDataDir, 'governance_data.json') };
+};
+
+const { dir: DATA_DIR, file: DATA_FILE } = resolveDataFile();
 
 const INITIAL_SOURCES: DataSource[] = [
   {
@@ -102,6 +113,7 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     technicalIdentity: 'agent-svc-airline-faq',
     systemOwner: 'VP Customer Experience',
     processOwner: 'Passenger Rights & Helpdesk Director',
+    department: 'TI Support America - Customer Helpdesk',
     riskTier: 'MEDIUM',
     scopes: ['support:read_policy', 'support:answer_inquiry'],
     allowedDataSources: ['src-airline-policy-01'],
@@ -119,6 +131,7 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     technicalIdentity: 'agent-svc-sap-treasury',
     systemOwner: 'Corporate Comptroller',
     processOwner: 'Head of Treasury Operations',
+    department: 'Corporate Treasury & Finance',
     riskTier: 'CRITICAL',
     scopes: ['erp:read_orders', 'erp:create_payment', 'financial:transfer_funds'],
     allowedDataSources: ['src-fin-ledger-03', 'src-crm-customers-02'],
@@ -136,6 +149,7 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     technicalIdentity: 'agent-svc-devops-executor',
     systemOwner: 'Director of Infrastructure',
     processOwner: 'Lead DevOps Architect',
+    department: 'DevOps & Cloud Infrastructure',
     riskTier: 'HIGH',
     scopes: ['db:read_replica', 'db:execute_migration', 'infra:provision'],
     allowedDataSources: ['src-codebase-intel-04'],
@@ -153,6 +167,7 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     technicalIdentity: 'agent-svc-eng-assistant',
     systemOwner: 'Chief Technology Officer',
     processOwner: 'Hardware Architecture Group',
+    department: 'Semiconductor R&D - Hardware',
     riskTier: 'MEDIUM',
     scopes: ['code:read_internal', 'code:propose_refactor'],
     allowedDataSources: ['src-codebase-intel-04'],
@@ -163,6 +178,79 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     tokenExpiresAt: '2026-12-31T00:00:00Z',
     killSwitchActive: false,
     createdAt: '2026-03-10T11:00:00Z'
+  }
+];
+
+const INITIAL_MODELS: AIModel[] = [
+  {
+    id: 'model-claude-3-5-sonnet',
+    name: 'Claude 3.5 Sonnet (Enterprise Cloud)',
+    provider: 'Anthropic',
+    type: 'EXTERNAL',
+    endpointUrl: 'https://api.anthropic.com/v1',
+    modelIdentifier: 'claude-3-5-sonnet-20241022',
+    apiKeyPrefix: 'sk-ant-api03-***',
+    maxContextTokens: 200000,
+    dataClassificationClearance: 'CONFIDENTIAL',
+    allowedRiskTiers: ['LOW', 'MEDIUM', 'HIGH'],
+    enforceGrounding: true,
+    status: 'ACTIVE',
+    owner: 'VP of AI Platforms',
+    department: 'Customer Experience & Enterprise AI',
+    createdAt: '2026-01-15T00:00:00Z',
+    lastUpdated: '2026-10-28T12:00:00Z'
+  },
+  {
+    id: 'model-gpt-4o',
+    name: 'GPT-4o Enterprise (Zero-Retention Cloud)',
+    provider: 'OpenAI',
+    type: 'EXTERNAL',
+    endpointUrl: 'https://api.openai.com/v1',
+    modelIdentifier: 'gpt-4o',
+    apiKeyPrefix: 'sk-proj-live-***',
+    maxContextTokens: 128000,
+    dataClassificationClearance: 'CONFIDENTIAL',
+    allowedRiskTiers: ['LOW', 'MEDIUM', 'HIGH'],
+    enforceGrounding: true,
+    status: 'ACTIVE',
+    owner: 'Chief Technology Officer',
+    department: 'Corporate Technology Group',
+    createdAt: '2026-01-20T00:00:00Z',
+    lastUpdated: '2026-10-28T12:00:00Z'
+  },
+  {
+    id: 'model-local-llama3-ollama',
+    name: 'Llama 3.2 8B / 70B (Local Ollama Air-Gapped)',
+    provider: 'Ollama',
+    type: 'LOCAL',
+    endpointUrl: 'http://localhost:11434',
+    modelIdentifier: 'llama3.2:latest',
+    maxContextTokens: 128000,
+    dataClassificationClearance: 'RESTRICTED',
+    allowedRiskTiers: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
+    enforceGrounding: true,
+    status: 'ACTIVE',
+    owner: 'Director of CyberSecurity & Infrastructure',
+    department: 'TI Security & On-Premises Compute',
+    createdAt: '2026-02-01T00:00:00Z',
+    lastUpdated: '2026-10-28T12:00:00Z'
+  },
+  {
+    id: 'model-local-vllm-mistral',
+    name: 'Mistral Large / NeMo (Local vLLM GPU Cluster)',
+    provider: 'vLLM',
+    type: 'LOCAL',
+    endpointUrl: 'http://vllm-cluster.internal:8000/v1',
+    modelIdentifier: 'mistralai/Mistral-Large-Instruct',
+    maxContextTokens: 64000,
+    dataClassificationClearance: 'RESTRICTED',
+    allowedRiskTiers: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
+    enforceGrounding: false,
+    status: 'ACTIVE',
+    owner: 'Chief AI Research Scientist',
+    department: 'R&D & High Performance Compute',
+    createdAt: '2026-03-01T00:00:00Z',
+    lastUpdated: '2026-10-28T12:00:00Z'
   }
 ];
 
@@ -481,7 +569,28 @@ export class GovernanceDatabase {
               delete agent.apiKey;
               migrated = true;
             }
+            if (!agent.department) {
+              const init = INITIAL_AGENTS.find((ia) => ia.id === agent.id);
+              if (init?.department) {
+                agent.department = init.department;
+                migrated = true;
+              }
+            }
             return agent;
+          });
+        }
+
+        // Audit Trail Enrichment: Ensure all historical audit records have agentName, department, and userId
+        if (Array.isArray(parsed.auditRecords)) {
+          parsed.auditRecords = parsed.auditRecords.map((record: any) => {
+            if (!record.identityEvidence.department || !record.identityEvidence.userId || !record.identityEvidence.agentName) {
+              const agent = parsed.agents.find((a: any) => a.id === record.identityEvidence.agentId);
+              record.identityEvidence.agentName = record.identityEvidence.agentName || agent?.name || record.identityEvidence.agentId;
+              record.identityEvidence.department = record.identityEvidence.department || agent?.department || agent?.processOwner || 'Enterprise Operations';
+              record.identityEvidence.userId = record.identityEvidence.userId || (record.identityEvidence.technicalIdentity === 'human-governance-officer' ? (record.approvalEvidence?.approvedBy || 'governance-officer') : 'operator-user');
+              migrated = true;
+            }
+            return record;
           });
         }
 
@@ -501,6 +610,12 @@ export class GovernanceDatabase {
           });
         }
 
+        // Initialize AI Models registry if missing in existing local stores
+        if (!parsed.models || !Array.isArray(parsed.models) || parsed.models.length === 0) {
+          parsed.models = INITIAL_MODELS;
+          migrated = true;
+        }
+
         if (migrated) {
           this.saveData(parsed);
         }
@@ -513,6 +628,7 @@ export class GovernanceDatabase {
     const initialData: DatabaseSchema = {
       sources: INITIAL_SOURCES,
       agents: INITIAL_AGENTS,
+      models: INITIAL_MODELS,
       policies: INITIAL_POLICIES,
       approvals: [],
       auditRecords: [],

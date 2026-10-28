@@ -35,6 +35,7 @@ export interface AgentIdentity {
   technicalIdentity: string;
   systemOwner: string;
   processOwner: string;
+  department?: string;
   riskTier: RiskLevel;
   scopes: string[];
   allowedDataSources: string[];
@@ -46,6 +47,28 @@ export interface AgentIdentity {
   killSwitchActive: boolean;
   createdAt: string;
   rawApiKey?: string;
+}
+
+export type ModelDeploymentType = 'EXTERNAL' | 'LOCAL';
+
+export interface AIModel {
+  id: string;
+  name: string;
+  provider: string; // 'OpenAI' | 'Anthropic' | 'Google' | 'Ollama' | 'vLLM' | 'Azure' | 'Local'
+  type: ModelDeploymentType;
+  endpointUrl: string; // e.g. 'https://api.openai.com/v1' or 'http://localhost:11434'
+  modelIdentifier: string; // e.g. 'gpt-4o', 'claude-3-5-sonnet', 'llama3.2:latest'
+  encryptedApiKey?: string;
+  apiKeyPrefix?: string;
+  maxContextTokens: number;
+  dataClassificationClearance: DataClassification;
+  allowedRiskTiers: RiskLevel[];
+  enforceGrounding: boolean;
+  status: 'ACTIVE' | 'SUSPENDED';
+  owner: string;
+  department?: string;
+  createdAt: string;
+  lastUpdated: string;
 }
 
 export interface ActionPolicy {
@@ -92,7 +115,10 @@ export interface EvidenceAuditRecord {
   };
   identityEvidence: {
     agentId: string;
+    agentName?: string;
     technicalIdentity: string;
+    userId?: string;
+    department?: string;
     scopesChecked: string[];
     killSwitchActive: boolean;
     isAuthorized: boolean;

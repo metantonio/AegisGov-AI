@@ -10,7 +10,7 @@ export const gatewayRouter = Router();
  */
 gatewayRouter.post('/process-prompt', (req: Request, res: Response) => {
   try {
-    const { agentId, userPrompt, sourceIds, purpose, targetModel } = req.body;
+    const { agentId, userPrompt, sourceIds, purpose, targetModel, userId, department } = req.body;
     if (!agentId || !userPrompt) {
       return res.status(400).json({
         error: 'Missing required parameters: `agentId` and `userPrompt` are mandatory.'
@@ -22,7 +22,9 @@ gatewayRouter.post('/process-prompt', (req: Request, res: Response) => {
       userPrompt,
       sourceIds,
       purpose,
-      targetModel
+      targetModel,
+      userId,
+      department
     });
 
     return res.json(result);
@@ -37,7 +39,7 @@ gatewayRouter.post('/process-prompt', (req: Request, res: Response) => {
  */
 gatewayRouter.post('/execute-action', (req: Request, res: Response) => {
   try {
-    const { agentId, toolName, parameters, environment, sourceIds, system } = req.body;
+    const { agentId, toolName, parameters, environment, sourceIds, system, userId, department } = req.body;
     if (!agentId || !toolName || !parameters) {
       return res.status(400).json({
         error: 'Missing required parameters: `agentId`, `toolName`, and `parameters` are mandatory.'
@@ -50,7 +52,9 @@ gatewayRouter.post('/execute-action', (req: Request, res: Response) => {
       parameters,
       environment,
       sourceIds,
-      system
+      system,
+      userId,
+      department
     });
 
     const statusCode = result.status === 'BLOCKED' ? 403 : result.status === 'PENDING_APPROVAL' ? 202 : 200;

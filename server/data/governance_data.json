@@ -104,10 +104,12 @@
         "airline.check_ticket_status"
       ],
       "environment": "production",
-      "apiKey": "aegis_live_aircan_key_9941a7c",
       "tokenExpiresAt": "2027-01-01T00:00:00Z",
       "killSwitchActive": false,
-      "createdAt": "2026-01-10T12:00:00Z"
+      "createdAt": "2026-01-10T12:00:00Z",
+      "apiKeyHash": "sha256-60a99fbe8e3cf0e01e3c0ac24ac75d31c6e92086efb4ee8dc0dc9e20e1cd1771",
+      "apiKeyPrefix": "aegis_live_air...",
+      "department": "TI Support America - Customer Helpdesk"
     },
     {
       "id": "agent-fin-treasury-02",
@@ -131,10 +133,12 @@
         "erp.read_orders"
       ],
       "environment": "production",
-      "apiKey": "aegis_live_fin_key_7718be8",
       "tokenExpiresAt": "2026-12-31T23:59:59Z",
       "killSwitchActive": false,
-      "createdAt": "2026-02-14T09:30:00Z"
+      "createdAt": "2026-02-14T09:30:00Z",
+      "apiKeyHash": "sha256-53389a0ab964df15c2a82f8072d36748d2cf6cccc723ea4e5929d51451e81fc7",
+      "apiKeyPrefix": "aegis_live_fin...",
+      "department": "Corporate Treasury & Finance"
     },
     {
       "id": "agent-replit-coder-03",
@@ -157,10 +161,12 @@
         "infra.restart_service"
       ],
       "environment": "sandbox",
-      "apiKey": "aegis_sandbox_devops_key_1192e4a",
       "tokenExpiresAt": "2026-11-30T00:00:00Z",
       "killSwitchActive": false,
-      "createdAt": "2026-03-01T15:20:00Z"
+      "createdAt": "2026-03-01T15:20:00Z",
+      "apiKeyHash": "sha256-61a4ee9c6d8841cef7276444d8aedc5058e529a8cbdf24caf0af903f6df47703",
+      "apiKeyPrefix": "aegis_sandbox_...",
+      "department": "DevOps & Cloud Infrastructure"
     },
     {
       "id": "agent-samsung-copilot-04",
@@ -181,10 +187,12 @@
         "code.run_tests"
       ],
       "environment": "production",
-      "apiKey": "aegis_live_samsung_copilot_5501fa3",
       "tokenExpiresAt": "2026-12-31T00:00:00Z",
       "killSwitchActive": false,
-      "createdAt": "2026-03-10T11:00:00Z"
+      "createdAt": "2026-03-10T11:00:00Z",
+      "apiKeyHash": "sha256-a5852d077f9a6d546a93b47107db94a4116a6e4932c82251f046359bb362d539",
+      "apiKeyPrefix": "aegis_live_sam...",
+      "department": "Semiconductor R&D - Hardware"
     }
   ],
   "policies": [
@@ -306,6 +314,27 @@
   ],
   "approvals": [
     {
+      "id": "appr-1793198617757-37545b",
+      "correlationId": "corr-action-1793198617757-eb25cf0e",
+      "agentId": "agent-fin-treasury-02",
+      "agentName": "Autonomous Treasury & Payment Reconciler",
+      "toolName": "financial.transfer_funds",
+      "parameters": {
+        "recipientIban": "GB82WEST12345678901234",
+        "amount": 8500,
+        "currency": "USD",
+        "idempotencyKey": "tx-2026-9901"
+      },
+      "riskLevel": "CRITICAL",
+      "status": "REJECTED",
+      "requestedAt": "2026-10-28T14:43:37.757Z",
+      "system": "Financial APIs",
+      "environment": "production",
+      "decidedAt": "2026-10-28T14:43:48.042Z",
+      "decidedBy": "sarah.connor@enterprise.com",
+      "decisionRationale": "Reviewed risk parameters and verified with process owner."
+    },
+    {
       "id": "appr-1793192150227-71e138",
       "correlationId": "corr-action-1793192150226-9c41a920",
       "agentId": "agent-fin-treasury-02",
@@ -338,10 +367,13 @@
         "currency": "USD"
       },
       "riskLevel": "CRITICAL",
-      "status": "PENDING",
+      "status": "REJECTED",
       "requestedAt": "2026-10-28T12:44:08.502Z",
       "system": "Financial APIs",
-      "environment": "production"
+      "environment": "production",
+      "decidedAt": "2026-10-28T14:51:48.630Z",
+      "decidedBy": "sarah.connor@enterprise.com",
+      "decisionRationale": "Reviewed risk parameters and verified with process owner."
     },
     {
       "id": "appr-1793191169846-02fdd3",
@@ -355,13 +387,335 @@
         "recipientIban": "GB82WEST12345678901234"
       },
       "riskLevel": "CRITICAL",
-      "status": "PENDING",
+      "status": "REJECTED",
       "requestedAt": "2026-10-28T12:39:29.846Z",
       "system": "Financial APIs",
-      "environment": "production"
+      "environment": "production",
+      "decidedAt": "2026-10-28T14:40:09.174Z",
+      "decidedBy": "sarah.connor@enterprise.com",
+      "decisionRationale": "Reviewed risk parameters and verified with process owner."
     }
   ],
   "auditRecords": [
+    {
+      "correlationId": "corr-action-1793191448502-08cd3dbb",
+      "timestamp": "2026-10-28T14:51:48.631Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "approval-decision",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "technicalIdentity": "human-governance-officer",
+        "userId": "sarah.connor@enterprise.com",
+        "department": "Governance & Compliance Committee",
+        "scopesChecked": [
+          "governance:authorize_action"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 10,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "financial.transfer_funds",
+        "model": "human-officer-decision",
+        "groundedSources": [],
+        "riskScore": 90,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "REJECTED",
+        "approvedBy": "sarah.connor@enterprise.com",
+        "rationale": "Reviewed risk parameters and verified with process owner."
+      },
+      "executionEvidence": {
+        "status": "BLOCKED",
+        "latencyMs": 120,
+        "outputSummary": "REJECTED by sarah.connor@enterprise.com: Reviewed risk parameters and verified with process owner.",
+        "reversible": true
+      },
+      "signatureHash": "7496fd1e7546a8f4755dcffb2dcfe8cbf76d619e4d02c6936793fcb5e96956fb",
+      "previousHash": "1f12a2d3a0c0d23985808925015b33db5a27bd7bf39334dcfaced87fc6420f91"
+    },
+    {
+      "correlationId": "corr-prompt-1793199035675-77767837",
+      "timestamp": "2026-10-28T14:50:35.675Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "freshnessVerified": true,
+        "dlpTriggered": true,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-samsung-copilot-04",
+        "agentName": "Semiconductor Engineering Copilot",
+        "technicalIdentity": "agent-svc-eng-assistant",
+        "userId": "usr-support-operator",
+        "department": "Semiconductor R&D - Hardware",
+        "scopesChecked": [
+          "code:read_internal",
+          "code:propose_refactor"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 42,
+        "dlpSanitized": true,
+        "redactedTokensCount": 1,
+        "entitiesDetected": [
+          "Proprietary Source Code / Hardware Schema"
+        ]
+      },
+      "decisionEvidence": {
+        "actionType": "PROMPT",
+        "model": "claude-3-5-sonnet",
+        "groundedSources": [],
+        "riskScore": 65,
+        "riskTier": "MEDIUM"
+      },
+      "approvalEvidence": {
+        "required": false,
+        "status": "AUTO_APPROVED",
+        "rationale": "Read-only contextual prompt with compliant grounded sources."
+      },
+      "executionEvidence": {
+        "status": "SUCCESS",
+        "latencyMs": 1,
+        "outputSummary": "Request processed safely. Sanitized contextual query dispatched to model....",
+        "reversible": true
+      },
+      "signatureHash": "1f12a2d3a0c0d23985808925015b33db5a27bd7bf39334dcfaced87fc6420f91",
+      "previousHash": "8c53bea216a3f3144b1f7613c434cbe55c67b33c55e336f6963566315ef479be"
+    },
+    {
+      "correlationId": "corr-action-1793198617757-eb25cf0e",
+      "timestamp": "2026-10-28T14:43:48.043Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "approval-decision",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "technicalIdentity": "human-governance-officer",
+        "scopesChecked": [
+          "governance:authorize_action"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true,
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "department": "Corporate Treasury & Finance",
+        "userId": "sarah.connor@enterprise.com"
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 10,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "financial.transfer_funds",
+        "model": "human-officer-decision",
+        "groundedSources": [],
+        "riskScore": 90,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "REJECTED",
+        "approvedBy": "sarah.connor@enterprise.com",
+        "rationale": "Reviewed risk parameters and verified with process owner."
+      },
+      "executionEvidence": {
+        "status": "BLOCKED",
+        "latencyMs": 120,
+        "outputSummary": "REJECTED by sarah.connor@enterprise.com: Reviewed risk parameters and verified with process owner.",
+        "reversible": true
+      },
+      "signatureHash": "8c53bea216a3f3144b1f7613c434cbe55c67b33c55e336f6963566315ef479be",
+      "previousHash": "15e1454963d28ee6301ab3fbf533f133dcdd0bf136328bb62dedf34ebed403d5"
+    },
+    {
+      "correlationId": "corr-action-1793198617757-eb25cf0e",
+      "timestamp": "2026-10-28T14:43:37.758Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "action-request",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "technicalIdentity": "agent-svc-sap-treasury",
+        "scopesChecked": [
+          "erp:read_orders",
+          "erp:create_payment",
+          "financial:transfer_funds"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true,
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "department": "Corporate Treasury & Finance",
+        "userId": "operator-user"
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 20,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "financial.transfer_funds",
+        "model": "aegis-policy-engine-v2",
+        "groundedSources": [],
+        "riskScore": 95,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "PENDING",
+        "policyRuleId": "pol-fin-transfer",
+        "rationale": "Action requires human authorization: Direct wire or ACH bank transfer. Strict vault secrets, idempotency & human approval"
+      },
+      "executionEvidence": {
+        "status": "PENDING_APPROVAL",
+        "latencyMs": 1,
+        "outputSummary": "Awaiting authorization ticket appr-1793198617757-37545b",
+        "reversible": true
+      },
+      "signatureHash": "15e1454963d28ee6301ab3fbf533f133dcdd0bf136328bb62dedf34ebed403d5",
+      "previousHash": "9457491a48a9316d408f6a82f572a244bf8430a68edf3eca3b7bc7714b7378c1"
+    },
+    {
+      "correlationId": "corr-prompt-1793198607798-2c073d0a",
+      "timestamp": "2026-10-28T14:43:27.798Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [
+          "src-crm-customers-02"
+        ],
+        "hash": "4395149ec87ae843a6fd94a67f47c333332527c2de7548acef31db1c9e9b0131",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 1
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "technicalIdentity": "agent-svc-sap-treasury",
+        "scopesChecked": [
+          "erp:read_orders",
+          "erp:create_payment",
+          "financial:transfer_funds"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true,
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "department": "Corporate Treasury & Finance",
+        "userId": "operator-user"
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 18,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "PROMPT",
+        "model": "claude-3-5-sonnet",
+        "groundedSources": [
+          "Enterprise CRM Customers & Accounts"
+        ],
+        "riskScore": 15,
+        "riskTier": "LOW"
+      },
+      "approvalEvidence": {
+        "required": false,
+        "status": "AUTO_APPROVED",
+        "rationale": "Read-only contextual prompt with compliant grounded sources."
+      },
+      "executionEvidence": {
+        "status": "SUCCESS",
+        "latencyMs": 0,
+        "outputSummary": "Your inquiry regarding bereavement refunds requires human specialist review acco...",
+        "reversible": true
+      },
+      "signatureHash": "9457491a48a9316d408f6a82f572a244bf8430a68edf3eca3b7bc7714b7378c1",
+      "previousHash": "50de6ecb376777da7a49ac7d3cd74689c1e9a97f7c9ebe4aba99d35768bd5e20"
+    },
+    {
+      "correlationId": "corr-action-1793191169846-88e0fb17",
+      "timestamp": "2026-10-28T14:40:09.174Z",
+      "environment": "production",
+      "sourceEvidence": {
+        "sourceIds": [],
+        "hash": "approval-decision",
+        "freshnessVerified": true,
+        "dlpTriggered": false,
+        "sourcesCount": 0
+      },
+      "identityEvidence": {
+        "agentId": "agent-fin-treasury-02",
+        "technicalIdentity": "human-governance-officer",
+        "scopesChecked": [
+          "governance:authorize_action"
+        ],
+        "killSwitchActive": false,
+        "isAuthorized": true,
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "department": "Corporate Treasury & Finance",
+        "userId": "sarah.connor@enterprise.com"
+      },
+      "contextEvidence": {
+        "inputTokensApprox": 10,
+        "dlpSanitized": false,
+        "redactedTokensCount": 0,
+        "entitiesDetected": []
+      },
+      "decisionEvidence": {
+        "actionType": "TOOL_INVOCATION",
+        "toolName": "financial.transfer_funds",
+        "model": "human-officer-decision",
+        "groundedSources": [],
+        "riskScore": 90,
+        "riskTier": "CRITICAL"
+      },
+      "approvalEvidence": {
+        "required": true,
+        "status": "REJECTED",
+        "approvedBy": "sarah.connor@enterprise.com",
+        "rationale": "Reviewed risk parameters and verified with process owner."
+      },
+      "executionEvidence": {
+        "status": "BLOCKED",
+        "latencyMs": 120,
+        "outputSummary": "REJECTED by sarah.connor@enterprise.com: Reviewed risk parameters and verified with process owner.",
+        "reversible": true
+      },
+      "signatureHash": "50de6ecb376777da7a49ac7d3cd74689c1e9a97f7c9ebe4aba99d35768bd5e20",
+      "previousHash": "5e156b47c0ff78d1b4d08699da1c38d08597cd52c099e006f17083c56773b229"
+    },
     {
       "correlationId": "corr-action-1793192150226-9c41a920",
       "timestamp": "2026-10-28T12:56:25.337Z",
@@ -380,7 +734,10 @@
           "governance:authorize_action"
         ],
         "killSwitchActive": false,
-        "isAuthorized": true
+        "isAuthorized": true,
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "department": "Corporate Treasury & Finance",
+        "userId": "sarah.connor@enterprise.com"
       },
       "contextEvidence": {
         "inputTokensApprox": 10,
@@ -431,7 +788,10 @@
           "financial:transfer_funds"
         ],
         "killSwitchActive": false,
-        "isAuthorized": true
+        "isAuthorized": true,
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "department": "Corporate Treasury & Finance",
+        "userId": "operator-user"
       },
       "contextEvidence": {
         "inputTokensApprox": 20,
@@ -483,7 +843,10 @@
           "support:answer_inquiry"
         ],
         "killSwitchActive": false,
-        "isAuthorized": true
+        "isAuthorized": true,
+        "agentName": "Air Canada Customer Support Assistant",
+        "department": "TI Support America - Customer Helpdesk",
+        "userId": "operator-user"
       },
       "contextEvidence": {
         "inputTokensApprox": 30,
@@ -534,7 +897,10 @@
           "financial:transfer_funds"
         ],
         "killSwitchActive": false,
-        "isAuthorized": true
+        "isAuthorized": true,
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "department": "Corporate Treasury & Finance",
+        "userId": "operator-user"
       },
       "contextEvidence": {
         "inputTokensApprox": 20,
@@ -586,7 +952,10 @@
           "support:answer_inquiry"
         ],
         "killSwitchActive": false,
-        "isAuthorized": true
+        "isAuthorized": true,
+        "agentName": "Air Canada Customer Support Assistant",
+        "department": "TI Support America - Customer Helpdesk",
+        "userId": "operator-user"
       },
       "contextEvidence": {
         "inputTokensApprox": 22,
@@ -640,7 +1009,10 @@
           "support:answer_inquiry"
         ],
         "killSwitchActive": false,
-        "isAuthorized": true
+        "isAuthorized": true,
+        "agentName": "Air Canada Customer Support Assistant",
+        "department": "TI Support America - Customer Helpdesk",
+        "userId": "operator-user"
       },
       "contextEvidence": {
         "inputTokensApprox": 18,
@@ -687,7 +1059,10 @@
         "technicalIdentity": "blocked-subject",
         "scopesChecked": [],
         "killSwitchActive": true,
-        "isAuthorized": false
+        "isAuthorized": false,
+        "agentName": "SaaS DevOps & Migration Agent (SaaStr Case)",
+        "department": "DevOps & Cloud Infrastructure",
+        "userId": "operator-user"
       },
       "contextEvidence": {
         "inputTokensApprox": 0,
@@ -737,7 +1112,10 @@
           "financial:transfer_funds"
         ],
         "killSwitchActive": false,
-        "isAuthorized": true
+        "isAuthorized": true,
+        "agentName": "Autonomous Treasury & Payment Reconciler",
+        "department": "Corporate Treasury & Finance",
+        "userId": "operator-user"
       },
       "contextEvidence": {
         "inputTokensApprox": 20,
@@ -789,7 +1167,10 @@
           "support:answer_inquiry"
         ],
         "killSwitchActive": false,
-        "isAuthorized": true
+        "isAuthorized": true,
+        "agentName": "Air Canada Customer Support Assistant",
+        "department": "TI Support America - Customer Helpdesk",
+        "userId": "operator-user"
       },
       "contextEvidence": {
         "inputTokensApprox": 15,
@@ -1069,5 +1450,95 @@
       "legalCompliance": "C"
     }
   ],
-  "globalKillSwitch": false
+  "globalKillSwitch": false,
+  "models": [
+    {
+      "id": "model-claude-3-5-sonnet",
+      "name": "Claude 3.5 Sonnet (Enterprise Cloud)",
+      "provider": "Anthropic",
+      "type": "EXTERNAL",
+      "endpointUrl": "https://api.anthropic.com/v1",
+      "modelIdentifier": "claude-3-5-sonnet-20241022",
+      "apiKeyPrefix": "sk-ant-api03-***",
+      "maxContextTokens": 200000,
+      "dataClassificationClearance": "CONFIDENTIAL",
+      "allowedRiskTiers": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "enforceGrounding": true,
+      "status": "ACTIVE",
+      "owner": "VP of AI Platforms",
+      "department": "Customer Experience & Enterprise AI",
+      "createdAt": "2026-01-15T00:00:00Z",
+      "lastUpdated": "2026-10-28T12:00:00Z"
+    },
+    {
+      "id": "model-gpt-4o",
+      "name": "GPT-4o Enterprise (Zero-Retention Cloud)",
+      "provider": "OpenAI",
+      "type": "EXTERNAL",
+      "endpointUrl": "https://api.openai.com/v1",
+      "modelIdentifier": "gpt-4o",
+      "apiKeyPrefix": "sk-proj-live-***",
+      "maxContextTokens": 128000,
+      "dataClassificationClearance": "CONFIDENTIAL",
+      "allowedRiskTiers": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "enforceGrounding": true,
+      "status": "ACTIVE",
+      "owner": "Chief Technology Officer",
+      "department": "Corporate Technology Group",
+      "createdAt": "2026-01-20T00:00:00Z",
+      "lastUpdated": "2026-10-28T12:00:00Z"
+    },
+    {
+      "id": "model-local-llama3-ollama",
+      "name": "Llama 3.2 8B / 70B (Local Ollama Air-Gapped)",
+      "provider": "Ollama",
+      "type": "LOCAL",
+      "endpointUrl": "http://localhost:11434",
+      "modelIdentifier": "llama3.2:latest",
+      "maxContextTokens": 128000,
+      "dataClassificationClearance": "RESTRICTED",
+      "allowedRiskTiers": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "enforceGrounding": true,
+      "status": "ACTIVE",
+      "owner": "Director of CyberSecurity & Infrastructure",
+      "department": "TI Security & On-Premises Compute",
+      "createdAt": "2026-02-01T00:00:00Z",
+      "lastUpdated": "2026-10-28T12:00:00Z"
+    },
+    {
+      "id": "model-local-vllm-mistral",
+      "name": "Mistral Large / NeMo (Local vLLM GPU Cluster)",
+      "provider": "vLLM",
+      "type": "LOCAL",
+      "endpointUrl": "http://vllm-cluster.internal:8000/v1",
+      "modelIdentifier": "mistralai/Mistral-Large-Instruct",
+      "maxContextTokens": 64000,
+      "dataClassificationClearance": "RESTRICTED",
+      "allowedRiskTiers": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "enforceGrounding": false,
+      "status": "ACTIVE",
+      "owner": "Chief AI Research Scientist",
+      "department": "R&D & High Performance Compute",
+      "createdAt": "2026-03-01T00:00:00Z",
+      "lastUpdated": "2026-10-28T12:00:00Z"
+    }
+  ]
 }

@@ -14,6 +14,8 @@ export interface PromptGovernanceRequest {
   sourceIds?: string[];
   purpose?: string;
   targetModel?: string;
+  userId?: string;
+  department?: string;
 }
 
 export interface PromptGovernanceResponse {
@@ -39,6 +41,8 @@ export interface ToolActionRequest {
   environment?: 'sandbox' | 'production';
   sourceIds?: string[];
   system?: string;
+  userId?: string;
+  department?: string;
 }
 
 export interface ToolActionResponse {
@@ -151,7 +155,10 @@ export class GovernanceEngine {
       },
       identityEvidence: {
         agentId: agent.id,
+        agentName: agent.name,
         technicalIdentity: agent.technicalIdentity,
+        userId: req.userId || 'usr-support-operator',
+        department: req.department || agent.department || agent.processOwner || 'IT Support Operations',
         scopesChecked: agent.scopes,
         killSwitchActive: agent.killSwitchActive,
         isAuthorized: true
@@ -271,7 +278,10 @@ export class GovernanceEngine {
         },
         identityEvidence: {
           agentId: agent.id,
+          agentName: agent.name,
           technicalIdentity: agent.technicalIdentity,
+          userId: req.userId || 'usr-support-operator',
+          department: req.department || agent.department || agent.processOwner || 'IT Support Operations',
           scopesChecked: agent.scopes,
           killSwitchActive: agent.killSwitchActive,
           isAuthorized: true
@@ -337,7 +347,10 @@ export class GovernanceEngine {
       },
       identityEvidence: {
         agentId: agent.id,
+        agentName: agent.name,
         technicalIdentity: agent.technicalIdentity,
+        userId: req.userId || 'usr-support-operator',
+        department: req.department || agent.department || agent.processOwner || 'IT Support Operations',
         scopesChecked: agent.scopes,
         killSwitchActive: agent.killSwitchActive,
         isAuthorized: true
@@ -419,7 +432,10 @@ export class GovernanceEngine {
       },
       identityEvidence: {
         agentId: approval.agentId,
+        agentName: approval.agentName,
         technicalIdentity: 'human-governance-officer',
+        userId: decidedBy,
+        department: 'Governance & Compliance Committee',
         scopesChecked: ['governance:authorize_action'],
         killSwitchActive: false,
         isAuthorized: true
@@ -462,6 +478,7 @@ export class GovernanceEngine {
     reason: string,
     toolName?: string
   ): void {
+    const agent = db.getAgentById(agentId);
     db.addAuditRecord({
       correlationId,
       timestamp: new Date().toISOString(),
@@ -475,7 +492,10 @@ export class GovernanceEngine {
       },
       identityEvidence: {
         agentId,
-        technicalIdentity: 'blocked-subject',
+        agentName: agent?.name || agentId,
+        technicalIdentity: agent?.technicalIdentity || 'blocked-subject',
+        userId: 'unauthorized-caller',
+        department: agent?.department || agent?.processOwner || 'Security Operations',
         scopesChecked: [],
         killSwitchActive: true,
         isAuthorized: false
