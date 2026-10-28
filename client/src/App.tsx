@@ -88,8 +88,31 @@ export function App() {
         <PipelineVisualizer />
 
         {loading && !stats ? (
-          <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
-            Connecting to ISO 42001 Governance Middleware...
+          <div style={{
+            textAlign: 'center',
+            padding: '80px 24px',
+            background: '#0c1220',
+            borderRadius: '10px',
+            border: '1px solid #1e293b',
+            margin: '40px 0'
+          }}>
+            <div style={{
+              display: 'inline-block',
+              width: '36px',
+              height: '36px',
+              border: '3px solid rgba(56, 189, 248, 0.2)',
+              borderTopColor: '#38bdf8',
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+              marginBottom: '16px'
+            }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#ffffff' }}>
+              Initializing Enterprise Governance Control Plane...
+            </div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+              Verifying AES-256 Vault, PEP Policies, and SHA-256 Ledger Integrity
+            </div>
           </div>
         ) : (
           <>
@@ -128,14 +151,36 @@ export function App() {
       </main>
 
       <footer style={{
-        borderTop: '1px solid var(--border-subtle)',
-        padding: '20px 24px',
-        textAlign: 'center',
+        borderTop: '1px solid var(--border-color)',
+        padding: '24px 32px',
         fontSize: '0.75rem',
-        color: 'var(--text-faint)',
-        background: '#060911'
+        color: 'var(--text-muted)',
+        background: '#060a12',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px'
       }}>
-        AegisGov AI · Enterprise Data & AI Governance Middleware Platform · Aligned with ISO/IEC 42001:2023, NIST AI RMF 1.0, EU AI Act & GDPR
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div style={{ fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>AegisGov™ Enterprise AI & Data Governance Middleware</span>
+            <span style={{ fontSize: '0.65rem', padding: '1px 6px', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', borderRadius: '4px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>v2.4.0-enterprise</span>
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-faint)' }}>
+            Copyright © 2026 Qualex Consulting Services INC & Antonio Martínez. All Rights Reserved.
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.72rem', color: 'var(--text-faint)' }}>
+          <span>ISO/IEC 42001:2023</span>
+          <span>•</span>
+          <span>NIST AI RMF 1.0</span>
+          <span>•</span>
+          <span>EU AI Act Art. 14 (HITL)</span>
+          <span>•</span>
+          <span>FIPS 140-3 Cryptography</span>
+        </div>
       </footer>
     </div>
   );
