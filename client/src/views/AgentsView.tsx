@@ -4,10 +4,12 @@ import { api } from '../services/api';
 
 interface AgentsViewProps {
   agents: any[];
+  sources?: any[];
+  policies?: any[];
   onRefresh: () => void;
 }
 
-export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => {
+export const AgentsView: React.FC<AgentsViewProps> = ({ agents, sources = [], policies = [], onRefresh }) => {
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [technicalIdentity, setTechnicalIdentity] = useState('');
@@ -20,6 +22,32 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
   const [allowedTools, setAllowedTools] = useState('airline.lookup_fare_rules');
   const [allowedDataSources, setAllowedDataSources] = useState('src-airline-policy-01');
   const [loading, setLoading] = useState(false);
+
+  const COMMON_SCOPES = [
+    'support:read_policy',
+    'support:answer_inquiry',
+    'tickets:manage',
+    'crm:read_customer',
+    'erp:read',
+    'erp:manage',
+    'erp:delete',
+    'db:query',
+    'analytics:read'
+  ];
+
+  const toggleCsvItem = (csvStr: string, item: string): string => {
+    const list = csvStr.split(',').map((s) => s.trim()).filter(Boolean);
+    if (list.includes(item)) {
+      return list.filter((x) => x !== item).join(', ');
+    } else {
+      return [...list, item].join(', ');
+    }
+  };
+
+  const isCsvItemPresent = (csvStr: string, item: string): boolean => {
+    const list = csvStr.split(',').map((s) => s.trim()).filter(Boolean);
+    return list.includes(item);
+  };
 
   // Edit permissions state
   const [editingAgent, setEditingAgent] = useState<any | null>(null);
@@ -379,7 +407,7 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
           justifyContent: 'center',
           zIndex: 1000
         }}>
-          <div className="glass-panel" style={{ width: '500px', maxWidth: '90%', padding: '24px' }}>
+          <div className="glass-panel" style={{ width: '680px', maxWidth: '95%', maxHeight: '90vh', overflowY: 'auto', padding: '24px' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>
               Register Technical AI Agent Identity
             </h3>
@@ -430,19 +458,138 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
                 </div>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Allowed Scopes (comma separated)</label>
-                <input value={scopes} onChange={(e) => setScopes(e.target.value)} />
+              {/* Data Sources Interactive Picker */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--accent-cyan)', marginBottom: '6px' }}>
+                  Select Allowed Data Sources (Data Catalog Stage 1):
+                </label>
+                {sources.length > 0 ? (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                    {sources.map((src) => {
+                      const selected = isCsvItemPresent(allowedDataSources, src.id);
+                      return (
+                        <button
+                          key={src.id}
+                          type="button"
+                          onClick={() => setAllowedDataSources(toggleCsvItem(allowedDataSources, src.id))}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            cursor: 'pointer',
+                            background: selected ? 'rgba(0, 243, 255, 0.15)' : 'rgba(255,255,255,0.03)',
+                            border: selected ? '1px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
+                            color: selected ? '#ffffff' : 'var(--text-muted)'
+                          }}
+                        >
+                          {selected ? <Check size={12} color="var(--accent-cyan)" /> : <Plus size={12} />}
+                          <span>{src.name} <code style={{ fontSize: '0.68rem', opacity: 0.8 }}>({src.id})</code></span>
+                          <span style={{ fontSize: '0.62rem', padding: '1px 4px', borderRadius: '3px', background: 'rgba(255,255,255,0.08)' }}>{src.classification}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px' }}>
+                    No data sources found in Data Catalog. You can add them in the Data Catalog tab.
+                  </div>
+                )}
+                <input
+                  value={allowedDataSources}
+                  onChange={(e) => setAllowedDataSources(e.target.value)}
+                  placeholder="Or type comma-separated IDs: e.g. src-us-tickets-db, src-snowflake-us"
+                  style={{ fontSize: '0.78rem' }}
+                />
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Allowed Tools (comma separated)</label>
-                <input value={allowedTools} onChange={(e) => setAllowedTools(e.target.value)} />
+              {/* Action Tools Interactive Picker */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: '#c084fc', marginBottom: '6px' }}>
+                  Select Allowed Action Tools (Action Risk Matrix Stage 5):
+                </label>
+                {policies.length > 0 ? (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                    {policies.map((pol) => {
+                      const selected = isCsvItemPresent(allowedTools, pol.toolName);
+                      return (
+                        <button
+                          key={pol.id}
+                          type="button"
+                          onClick={() => setAllowedTools(toggleCsvItem(allowedTools, pol.toolName))}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            cursor: 'pointer',
+                            background: selected ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255,255,255,0.03)',
+                            border: selected ? '1px solid #a855f7' : '1px solid var(--border-subtle)',
+                            color: selected ? '#ffffff' : 'var(--text-muted)'
+                          }}
+                        >
+                          {selected ? <Check size={12} color="#c084fc" /> : <Plus size={12} />}
+                          <code>{pol.toolName}</code>
+                          <span style={{ fontSize: '0.62rem', padding: '1px 4px', borderRadius: '3px', background: 'rgba(255,255,255,0.08)' }}>{pol.riskLevel}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px' }}>
+                    No tools defined in Action Policies yet. Create them in the Action Policies tab.
+                  </div>
+                )}
+                <input
+                  value={allowedTools}
+                  onChange={(e) => setAllowedTools(e.target.value)}
+                  placeholder="Or type comma-separated tools: e.g. erp.delete, crm.read_customer"
+                  style={{ fontSize: '0.78rem' }}
+                />
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Allowed Data Sources (comma separated IDs)</label>
-                <input value={allowedDataSources} onChange={(e) => setAllowedDataSources(e.target.value)} placeholder="e.g. src-us-tickets-db, src-snowflake-us" />
+              {/* Scopes Picker */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '6px' }}>
+                  Allowed Scopes (Functional Permissions):
+                </label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                  {COMMON_SCOPES.map((sc) => {
+                    const selected = isCsvItemPresent(scopes, sc);
+                    return (
+                      <button
+                        key={sc}
+                        type="button"
+                        onClick={() => setScopes(toggleCsvItem(scopes, sc))}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.72rem',
+                          cursor: 'pointer',
+                          background: selected ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255,255,255,0.03)',
+                          border: selected ? '1px solid #3b82f6' : '1px solid var(--border-subtle)',
+                          color: selected ? '#ffffff' : 'var(--text-muted)'
+                        }}
+                      >
+                        {selected ? <Check size={12} color="#60a5fa" /> : <Plus size={12} />}
+                        <code>{sc}</code>
+                      </button>
+                    );
+                  })}
+                </div>
+                <input
+                  value={scopes}
+                  onChange={(e) => setScopes(e.target.value)}
+                  placeholder="Comma-separated scopes: support:read_policy, erp:delete"
+                  style={{ fontSize: '0.78rem' }}
+                />
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
@@ -517,26 +664,141 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
                 </div>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  Allowed Data Sources (Whitelisted DBs / Data Lakes)
+              {/* Data Sources Interactive Picker */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--accent-cyan)', marginBottom: '6px' }}>
+                  Allowed Data Sources (Whitelisted Databases / Data Lakes):
                 </label>
-                <input value={editAllowedSources} onChange={(e) => setEditAllowedSources(e.target.value)} placeholder="comma separated IDs, e.g. src-us-tickets-db, src-snowflake-us" />
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-faint)' }}>Only data sources in this list can be queried by this agent.</span>
+                {sources.length > 0 ? (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                    {sources.map((src) => {
+                      const selected = isCsvItemPresent(editAllowedSources, src.id);
+                      return (
+                        <button
+                          key={src.id}
+                          type="button"
+                          onClick={() => setEditAllowedSources(toggleCsvItem(editAllowedSources, src.id))}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            cursor: 'pointer',
+                            background: selected ? 'rgba(0, 243, 255, 0.15)' : 'rgba(255,255,255,0.03)',
+                            border: selected ? '1px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
+                            color: selected ? '#ffffff' : 'var(--text-muted)'
+                          }}
+                        >
+                          {selected ? <Check size={12} color="var(--accent-cyan)" /> : <Plus size={12} />}
+                          <span>{src.name} <code style={{ fontSize: '0.68rem', opacity: 0.8 }}>({src.id})</code></span>
+                          <span style={{ fontSize: '0.62rem', padding: '1px 4px', borderRadius: '3px', background: 'rgba(255,255,255,0.08)' }}>{src.classification}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px' }}>
+                    No data sources found in Data Catalog.
+                  </div>
+                )}
+                <input
+                  value={editAllowedSources}
+                  onChange={(e) => setEditAllowedSources(e.target.value)}
+                  placeholder="comma separated IDs, e.g. src-us-tickets-db, src-snowflake-us"
+                  style={{ fontSize: '0.78rem' }}
+                />
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-faint)', marginTop: '4px', display: 'block' }}>
+                  Only data sources checked or listed here can be queried by this agent.
+                </span>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  Allowed Scopes (Functional capabilities)
+              {/* Action Tools Interactive Picker */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: '#c084fc', marginBottom: '6px' }}>
+                  Allowed Action Tools (Executable API Functions from Stage 5 Policies):
                 </label>
-                <input value={editScopes} onChange={(e) => setEditScopes(e.target.value)} placeholder="comma separated, e.g. support:read_policy, support:us:manage" />
+                {policies.length > 0 ? (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                    {policies.map((pol) => {
+                      const selected = isCsvItemPresent(editAllowedTools, pol.toolName);
+                      return (
+                        <button
+                          key={pol.id}
+                          type="button"
+                          onClick={() => setEditAllowedTools(toggleCsvItem(editAllowedTools, pol.toolName))}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            cursor: 'pointer',
+                            background: selected ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255,255,255,0.03)',
+                            border: selected ? '1px solid #a855f7' : '1px solid var(--border-subtle)',
+                            color: selected ? '#ffffff' : 'var(--text-muted)'
+                          }}
+                        >
+                          {selected ? <Check size={12} color="#c084fc" /> : <Plus size={12} />}
+                          <code>{pol.toolName}</code>
+                          <span style={{ fontSize: '0.62rem', padding: '1px 4px', borderRadius: '3px', background: 'rgba(255,255,255,0.08)' }}>{pol.riskLevel}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginBottom: '8px' }}>
+                    No tools defined in Action Policies yet.
+                  </div>
+                )}
+                <input
+                  value={editAllowedTools}
+                  onChange={(e) => setEditAllowedTools(e.target.value)}
+                  placeholder="comma separated tools, e.g. erp.delete, crm.read_customer"
+                  style={{ fontSize: '0.78rem' }}
+                />
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  Allowed Tools (Executable API tools)
+              {/* Scopes Picker */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '12px' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '6px' }}>
+                  Allowed Scopes (Functional capabilities):
                 </label>
-                <input value={editAllowedTools} onChange={(e) => setEditAllowedTools(e.target.value)} placeholder="comma separated, e.g. jira.query_us_tickets, aws.s3_read_us" />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                  {COMMON_SCOPES.map((sc) => {
+                    const selected = isCsvItemPresent(editScopes, sc);
+                    return (
+                      <button
+                        key={sc}
+                        type="button"
+                        onClick={() => setEditScopes(toggleCsvItem(editScopes, sc))}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.72rem',
+                          cursor: 'pointer',
+                          background: selected ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255,255,255,0.03)',
+                          border: selected ? '1px solid #3b82f6' : '1px solid var(--border-subtle)',
+                          color: selected ? '#ffffff' : 'var(--text-muted)'
+                        }}
+                      >
+                        {selected ? <Check size={12} color="#60a5fa" /> : <Plus size={12} />}
+                        <code>{sc}</code>
+                      </button>
+                    );
+                  })}
+                </div>
+                <input
+                  value={editScopes}
+                  onChange={(e) => setEditScopes(e.target.value)}
+                  placeholder="comma separated, e.g. support:read_policy, support:us:manage"
+                  style={{ fontSize: '0.78rem' }}
+                />
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px', borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>

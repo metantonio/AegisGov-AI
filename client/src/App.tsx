@@ -106,13 +106,13 @@ export function App() {
               <DataCatalogView sources={sources} onRefresh={loadAllData} />
             )}
             {currentTab === 'agents' && (
-              <AgentsView agents={agents} onRefresh={loadAllData} />
+              <AgentsView agents={agents} sources={sources} policies={policies} onRefresh={loadAllData} />
             )}
             {currentTab === 'models' && (
               <ModelsView onRefresh={loadAllData} />
             )}
             {currentTab === 'policies' && (
-              <PoliciesView policies={policies} />
+              <PoliciesView policies={policies} onRefresh={loadAllData} />
             )}
             {currentTab === 'evidence' && (
               <EvidenceView evidence={evidence} onRefresh={loadAllData} />

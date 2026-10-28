@@ -784,12 +784,28 @@ export class GovernanceDatabase {
     return this.data.policies.find((p) => p.toolName === toolName);
   }
 
+  addPolicy(policy: ActionPolicy): ActionPolicy {
+    this.data.policies.push(policy);
+    this.saveData(this.data);
+    return policy;
+  }
+
   updatePolicy(id: string, updates: Partial<ActionPolicy>): ActionPolicy | undefined {
     const idx = this.data.policies.findIndex((p) => p.id === id);
     if (idx === -1) return undefined;
     this.data.policies[idx] = { ...this.data.policies[idx], ...updates };
     this.saveData(this.data);
     return this.data.policies[idx];
+  }
+
+  deletePolicy(id: string): boolean {
+    const initialLen = this.data.policies.length;
+    this.data.policies = this.data.policies.filter((p) => p.id !== id);
+    if (this.data.policies.length !== initialLen) {
+      this.saveData(this.data);
+      return true;
+    }
+    return false;
   }
 
   // --- Approvals ---

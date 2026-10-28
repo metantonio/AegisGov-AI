@@ -37,7 +37,9 @@ export const api = {
   deleteModel: (id: string) => fetchJson(`/models/${id}`, { method: 'DELETE' }),
 
   getPolicies: () => fetchJson('/policies'),
+  createPolicy: (policy: any) => fetchJson('/policies', { method: 'POST', body: JSON.stringify(policy) }),
   updatePolicy: (id: string, updates: any) => fetchJson(`/policies/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deletePolicy: (id: string) => fetchJson(`/policies/${id}`, { method: 'DELETE' }),
 
   getApprovals: () => fetchJson('/gateway/approvals'),
   decideApproval: (id: string, decision: 'APPROVED' | 'REJECTED', decidedBy: string, rationale: string) =>
