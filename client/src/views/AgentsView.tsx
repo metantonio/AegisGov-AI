@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Key, Plus, Power, ShieldAlert, CheckCircle, AlertTriangle, Terminal, Copy, Check, Lock } from 'lucide-react';
+import { Key, Plus, Power, ShieldAlert, CheckCircle, AlertTriangle, Terminal, Copy, Check, Lock, Sliders, Building, Edit3 } from 'lucide-react';
 import { api } from '../services/api';
 
 interface AgentsViewProps {
@@ -13,12 +13,24 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
   const [technicalIdentity, setTechnicalIdentity] = useState('');
   const [systemOwner, setSystemOwner] = useState('');
   const [processOwner, setProcessOwner] = useState('');
+  const [department, setDepartment] = useState('TI Support America - Customer Helpdesk');
   const [riskTier, setRiskTier] = useState('MEDIUM');
   const [environment, setEnvironment] = useState('sandbox');
   const [scopes, setScopes] = useState('support:read_policy, support:answer_inquiry');
   const [allowedTools, setAllowedTools] = useState('airline.lookup_fare_rules');
   const [allowedDataSources, setAllowedDataSources] = useState('src-airline-policy-01');
   const [loading, setLoading] = useState(false);
+
+  // Edit permissions state
+  const [editingAgent, setEditingAgent] = useState<any | null>(null);
+  const [editScopes, setEditScopes] = useState('');
+  const [editAllowedSources, setEditAllowedSources] = useState('');
+  const [editAllowedTools, setEditAllowedTools] = useState('');
+  const [editRiskTier, setEditRiskTier] = useState('MEDIUM');
+  const [editEnvironment, setEditEnvironment] = useState('sandbox');
+  const [editDepartment, setEditDepartment] = useState('');
+  const [editProcessOwner, setEditProcessOwner] = useState('');
+  const [editSystemOwner, setEditSystemOwner] = useState('');
 
   // One-time API key display modal
   const [createdKeyData, setCreatedKeyData] = useState<{ name: string; rawApiKey: string } | null>(null);
@@ -33,6 +45,42 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
     }
   };
 
+  const openEditModal = (agent: any) => {
+    setEditingAgent(agent);
+    setEditScopes((agent.scopes || []).join(', '));
+    setEditAllowedSources((agent.allowedDataSources || []).join(', '));
+    setEditAllowedTools((agent.allowedTools || []).join(', '));
+    setEditRiskTier(agent.riskTier || 'MEDIUM');
+    setEditEnvironment(agent.environment || 'sandbox');
+    setEditDepartment(agent.department || '');
+    setEditProcessOwner(agent.processOwner || '');
+    setEditSystemOwner(agent.systemOwner || '');
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAgent) return;
+    setLoading(true);
+    try {
+      await api.updateAgent(editingAgent.id, {
+        scopes: editScopes.split(',').map((s) => s.trim()).filter(Boolean),
+        allowedDataSources: editAllowedSources.split(',').map((s) => s.trim()).filter(Boolean),
+        allowedTools: editAllowedTools.split(',').map((s) => s.trim()).filter(Boolean),
+        riskTier: editRiskTier,
+        environment: editEnvironment,
+        department: editDepartment,
+        processOwner: editProcessOwner,
+        systemOwner: editSystemOwner
+      });
+      setEditingAgent(null);
+      onRefresh();
+    } catch (err: any) {
+      alert(err.message || 'Failed to update agent permissions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -42,6 +90,7 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
         technicalIdentity,
         systemOwner,
         processOwner,
+        department,
         riskTier,
         environment,
         scopes: scopes.split(',').map((s) => s.trim()).filter(Boolean),
@@ -128,22 +177,35 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
                 </span>
               </div>
 
-              {/* Kill Switch Toggle */}
-              <button
-                onClick={() => toggleKillSwitch(agent.id, agent.killSwitchActive)}
-                className="btn"
-                style={{
-                  background: agent.killSwitchActive ? 'var(--accent-rose)' : 'rgba(255, 255, 255, 0.05)',
-                  color: agent.killSwitchActive ? '#ffffff' : 'var(--text-muted)',
-                  border: `1px solid ${agent.killSwitchActive ? '#f43f5e' : 'var(--border-subtle)'}`,
-                  fontSize: '0.72rem',
-                  padding: '4px 8px'
-                }}
-                title="Toggle Emergency Isolation"
-              >
-                <Power size={13} />
-                <span>{agent.killSwitchActive ? 'LOCKED DOWN' : 'Kill Switch'}</span>
-              </button>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                {/* Edit Permissions Button */}
+                <button
+                  onClick={() => openEditModal(agent)}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '4px 8px' }}
+                  title="View & Edit Agent/Group Permissions"
+                >
+                  <Sliders size={13} />
+                  <span>Permissions</span>
+                </button>
+
+                {/* Kill Switch Toggle */}
+                <button
+                  onClick={() => toggleKillSwitch(agent.id, agent.killSwitchActive)}
+                  className="btn"
+                  style={{
+                    background: agent.killSwitchActive ? 'var(--accent-rose)' : 'rgba(255, 255, 255, 0.05)',
+                    color: agent.killSwitchActive ? '#ffffff' : 'var(--text-muted)',
+                    border: `1px solid ${agent.killSwitchActive ? '#f43f5e' : 'var(--border-subtle)'}`,
+                    fontSize: '0.72rem',
+                    padding: '4px 8px'
+                  }}
+                  title="Toggle Emergency Isolation"
+                >
+                  <Power size={13} />
+                  <span>{agent.killSwitchActive ? 'LOCKED DOWN' : 'Kill Switch'}</span>
+                </button>
+              </div>
             </div>
 
             <div>
@@ -153,6 +215,12 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
               <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
                 Identity: {agent.technicalIdentity}
               </div>
+              {agent.department && (
+                <div style={{ fontSize: '0.73rem', color: 'var(--accent-emerald)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Building size={12} />
+                  <span>{agent.department}</span>
+                </div>
+              )}
             </div>
 
             {/* Ownership */}
@@ -327,6 +395,11 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
                 <input required value={technicalIdentity} onChange={(e) => setTechnicalIdentity(e.target.value)} placeholder="agent-svc-invoice-auditor" />
               </div>
 
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Department / Organizational Unit</label>
+                <input value={department} onChange={(e) => setDepartment(e.target.value)} placeholder="e.g. TI Support America - Customer Helpdesk" />
+              </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Process Owner</label>
@@ -376,6 +449,100 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={loading}>
                   {loading ? 'Saving...' : 'Register Agent'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Permissions Modal */}
+      {editingAgent && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1050
+        }}>
+          <div className="glass-panel" style={{ width: '600px', maxWidth: '95%', maxHeight: '90vh', overflowY: 'auto', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '10px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+                  Edit Permissions & Governance Scopes
+                </h3>
+                <span style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>
+                  {editingAgent.name} ({editingAgent.technicalIdentity})
+                </span>
+              </div>
+              <button className="btn btn-secondary" onClick={() => setEditingAgent(null)} style={{ padding: '4px 8px' }}>Cancel</button>
+            </div>
+
+            <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Risk Tier</label>
+                  <select value={editRiskTier} onChange={(e) => setEditRiskTier(e.target.value)}>
+                    <option value="LOW">LOW</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="HIGH">HIGH</option>
+                    <option value="CRITICAL">CRITICAL</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Environment</label>
+                  <select value={editEnvironment} onChange={(e) => setEditEnvironment(e.target.value)}>
+                    <option value="sandbox">Sandbox</option>
+                    <option value="production">Production</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Department / Business Unit</label>
+                <input value={editDepartment} onChange={(e) => setEditDepartment(e.target.value)} placeholder="e.g. TI Support America - Customer Helpdesk" />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Process Owner</label>
+                  <input value={editProcessOwner} onChange={(e) => setEditProcessOwner(e.target.value)} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>System Owner</label>
+                  <input value={editSystemOwner} onChange={(e) => setEditSystemOwner(e.target.value)} />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                  Allowed Data Sources (Whitelisted DBs / Data Lakes)
+                </label>
+                <input value={editAllowedSources} onChange={(e) => setEditAllowedSources(e.target.value)} placeholder="comma separated IDs, e.g. src-us-tickets-db, src-snowflake-us" />
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-faint)' }}>Only data sources in this list can be queried by this agent.</span>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                  Allowed Scopes (Functional capabilities)
+                </label>
+                <input value={editScopes} onChange={(e) => setEditScopes(e.target.value)} placeholder="comma separated, e.g. support:read_policy, support:us:manage" />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                  Allowed Tools (Executable API tools)
+                </label>
+                <input value={editAllowedTools} onChange={(e) => setEditAllowedTools(e.target.value)} placeholder="comma separated, e.g. jira.query_us_tickets, aws.s3_read_us" />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px', borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setEditingAgent(null)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                  {loading ? 'Saving Changes...' : 'Save Permissions'}
                 </button>
               </div>
             </form>

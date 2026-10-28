@@ -24,8 +24,17 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ agents, sources, o
   const [mode, setMode] = useState<'prompt' | 'action'>('prompt');
   const [selectedAgentId, setSelectedAgentId] = useState<string>(agents[0]?.id || 'agent-airline-support-01');
   const [userPrompt, setUserPrompt] = useState<string>('Can I get a retroactive bereavement refund for my ticket after flying?');
-  const [targetModel, setTargetModel] = useState<string>('claude-3-5-sonnet');
+  const [targetModel, setTargetModel] = useState<string>('claude-3-5-sonnet-20241022');
   const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>(['src-airline-policy-01']);
+  const [availableModels, setAvailableModels] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    api.getModels().then((res) => {
+      if (res.models && res.models.length > 0) {
+        setAvailableModels(res.models);
+      }
+    }).catch(() => {});
+  }, []);
   
   // Action mode state
   const [toolName, setToolName] = useState<string>('financial.transfer_funds');
@@ -236,9 +245,19 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ agents, sources, o
                       Target Model
                     </label>
                     <select value={targetModel} onChange={(e) => setTargetModel(e.target.value)}>
-                      <option value="claude-3-5-sonnet">claude-3-5-sonnet</option>
-                      <option value="gpt-4o">gpt-4o</option>
-                      <option value="gemini-1-5-pro">gemini-1-5-pro</option>
+                      {availableModels.length > 0 ? (
+                        availableModels.map((m) => (
+                          <option key={m.id} value={m.modelIdentifier || m.id}>
+                            {m.name} [{m.type}] ({m.provider})
+                          </option>
+                        ))
+                      ) : (
+                        <>
+                          <option value="claude-3-5-sonnet">Claude 3.5 Sonnet (External Cloud)</option>
+                          <option value="gpt-4o">GPT-4o Enterprise (External Cloud)</option>
+                          <option value="llama3.2:latest">Llama 3.2 8B (Local Ollama Air-Gapped)</option>
+                        </>
+                      )}
                     </select>
                   </div>
                   <div>

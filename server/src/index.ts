@@ -9,6 +9,7 @@ import { evidenceRouter } from './routes/evidence.js';
 import { maturityRouter } from './routes/maturity.js';
 import { statsRouter } from './routes/stats.js';
 import { docsRouter } from './routes/docs.js';
+import { modelsRouter } from './routes/models.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -37,6 +38,7 @@ app.use('/api/v1/evidence', evidenceRouter);
 app.use('/api/v1/maturity', maturityRouter);
 app.use('/api/v1/stats', statsRouter);
 app.use('/api/v1/docs', docsRouter);
+app.use('/api/v1/models', modelsRouter);
 
 // Health check
 app.get('/health', (_req, res) => {

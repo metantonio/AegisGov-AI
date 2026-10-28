@@ -6,6 +6,7 @@ import { SimulatorView } from './views/SimulatorView';
 import { ApprovalsView } from './views/ApprovalsView';
 import { DataCatalogView } from './views/DataCatalogView';
 import { AgentsView } from './views/AgentsView';
+import { ModelsView } from './views/ModelsView';
 import { PoliciesView } from './views/PoliciesView';
 import { EvidenceView } from './views/EvidenceView';
 import { MaturityView } from './views/MaturityView';
@@ -106,6 +107,9 @@ export function App() {
             )}
             {currentTab === 'agents' && (
               <AgentsView agents={agents} onRefresh={loadAllData} />
+            )}
+            {currentTab === 'models' && (
+              <ModelsView onRefresh={loadAllData} />
             )}
             {currentTab === 'policies' && (
               <PoliciesView policies={policies} />

@@ -34,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'approvals', label: 'Approvals', icon: CheckSquare, badge: pendingApprovalsCount },
     { id: 'catalog', label: 'Data Catalog', icon: Database },
     { id: 'agents', label: 'Agent Identity', icon: Key },
+    { id: 'models', label: 'LLM Models', icon: Cpu },
     { id: 'policies', label: 'Risk Matrix', icon: Sliders },
     { id: 'evidence', label: 'Evidence Ledger', icon: ShieldAlert },
     { id: 'maturity', label: 'ISO 42001 Maturity', icon: Award },

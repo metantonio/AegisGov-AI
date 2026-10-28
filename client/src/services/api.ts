@@ -24,10 +24,17 @@ export const api = {
   
   getAgents: () => fetchJson('/agents'),
   createAgent: (agent: any) => fetchJson('/agents', { method: 'POST', body: JSON.stringify(agent) }),
+  updateAgent: (id: string, updates: any) => fetchJson(`/agents/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
   setAgentKillSwitch: (agentId: string, active: boolean) => 
     fetchJson(`/agents/${agentId}/kill-switch`, { method: 'PATCH', body: JSON.stringify({ active }) }),
   setGlobalKillSwitch: (active: boolean) =>
     fetchJson('/agents/global-kill-switch', { method: 'POST', body: JSON.stringify({ active }) }),
+
+  getModels: () => fetchJson('/models'),
+  createModel: (model: any) => fetchJson('/models', { method: 'POST', body: JSON.stringify(model) }),
+  updateModel: (id: string, updates: any) => fetchJson(`/models/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  setModelStatus: (id: string, status: 'ACTIVE' | 'SUSPENDED') => fetchJson(`/models/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  deleteModel: (id: string) => fetchJson(`/models/${id}`, { method: 'DELETE' }),
 
   getPolicies: () => fetchJson('/policies'),
   updatePolicy: (id: string, updates: any) => fetchJson(`/policies/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),

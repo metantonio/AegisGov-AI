@@ -57,6 +57,37 @@ agentsRouter.post('/', (req: Request, res: Response) => {
   });
 });
 
+agentsRouter.put('/:id', (req: Request, res: Response) => {
+  const {
+    name,
+    technicalIdentity,
+    systemOwner,
+    processOwner,
+    department,
+    riskTier,
+    scopes,
+    allowedDataSources,
+    allowedTools,
+    environment
+  } = req.body;
+
+  const updates: Partial<AgentIdentity> = {};
+  if (name !== undefined) updates.name = name;
+  if (technicalIdentity !== undefined) updates.technicalIdentity = technicalIdentity;
+  if (systemOwner !== undefined) updates.systemOwner = systemOwner;
+  if (processOwner !== undefined) updates.processOwner = processOwner;
+  if (department !== undefined) updates.department = department;
+  if (riskTier !== undefined) updates.riskTier = riskTier;
+  if (scopes !== undefined) updates.scopes = scopes;
+  if (allowedDataSources !== undefined) updates.allowedDataSources = allowedDataSources;
+  if (allowedTools !== undefined) updates.allowedTools = allowedTools;
+  if (environment !== undefined) updates.environment = environment;
+
+  const updated = db.updateAgent(req.params.id as string, updates);
+  if (!updated) return res.status(404).json({ error: 'Agent not found' });
+  return res.json({ success: true, agent: updated });
+});
+
 agentsRouter.patch('/:id/kill-switch', (req: Request, res: Response) => {
   const { active } = req.body;
   if (typeof active !== 'boolean') {

@@ -625,7 +625,44 @@ export class GovernanceDatabase {
       }
     }
 
+    const seedDemo = process.env.SEED_DEMO_DATA !== 'false';
     const initialData: DatabaseSchema = {
+      sources: seedDemo ? INITIAL_SOURCES : [],
+      agents: seedDemo ? INITIAL_AGENTS : [],
+      models: seedDemo ? INITIAL_MODELS : [],
+      policies: seedDemo ? INITIAL_POLICIES : [],
+      approvals: [],
+      auditRecords: [],
+      maturityControls: seedDemo
+        ? INITIAL_MATURITY_CONTROLS
+        : INITIAL_MATURITY_CONTROLS.map((c) => ({ ...c, status: 'NO' })),
+      raciMatrix: INITIAL_RACI,
+      globalKillSwitch: false
+    };
+
+    this.saveData(initialData);
+    return initialData;
+  }
+
+  resetToBlank(): DatabaseSchema {
+    const blankData: DatabaseSchema = {
+      sources: [],
+      agents: [],
+      models: [],
+      policies: [],
+      approvals: [],
+      auditRecords: [],
+      maturityControls: INITIAL_MATURITY_CONTROLS.map((c) => ({ ...c, status: 'NO' })),
+      raciMatrix: INITIAL_RACI,
+      globalKillSwitch: false
+    };
+    this.data = blankData;
+    this.saveData(blankData);
+    return blankData;
+  }
+
+  resetToDemo(): DatabaseSchema {
+    const demoData: DatabaseSchema = {
       sources: INITIAL_SOURCES,
       agents: INITIAL_AGENTS,
       models: INITIAL_MODELS,
@@ -636,9 +673,9 @@ export class GovernanceDatabase {
       raciMatrix: INITIAL_RACI,
       globalKillSwitch: false
     };
-
-    this.saveData(initialData);
-    return initialData;
+    this.data = demoData;
+    this.saveData(demoData);
+    return demoData;
   }
 
   private saveData(data: DatabaseSchema): void {
@@ -700,6 +737,42 @@ export class GovernanceDatabase {
 
   setAgentKillSwitch(id: string, active: boolean): AgentIdentity | undefined {
     return this.updateAgent(id, { killSwitchActive: active });
+  }
+
+  // --- AI Models (Stage 4) ---
+  getModels(): AIModel[] {
+    return this.data.models || [];
+  }
+
+  getModelById(id: string): AIModel | undefined {
+    return (this.data.models || []).find((m) => m.id === id || m.modelIdentifier === id);
+  }
+
+  addModel(model: AIModel): AIModel {
+    if (!this.data.models) this.data.models = [];
+    this.data.models.push(model);
+    this.saveData(this.data);
+    return model;
+  }
+
+  updateModel(id: string, updates: Partial<AIModel>): AIModel | undefined {
+    if (!this.data.models) this.data.models = [];
+    const idx = this.data.models.findIndex((m) => m.id === id);
+    if (idx === -1) return undefined;
+    this.data.models[idx] = { ...this.data.models[idx], ...updates, lastUpdated: new Date().toISOString() };
+    this.saveData(this.data);
+    return this.data.models[idx];
+  }
+
+  deleteModel(id: string): boolean {
+    if (!this.data.models) return false;
+    const initialLen = this.data.models.length;
+    this.data.models = this.data.models.filter((m) => m.id !== id);
+    if (this.data.models.length !== initialLen) {
+      this.saveData(this.data);
+      return true;
+    }
+    return false;
   }
 
   // --- Policies ---

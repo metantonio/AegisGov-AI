@@ -94,3 +94,22 @@ gatewayRouter.post('/approvals/:id/decide', (req: Request, res: Response) => {
     return res.status(400).json({ error: error.message });
   }
 });
+
+/**
+ * @route   POST /api/v1/gateway/system/reset
+ * @desc    Reset system state to BLANK (empty enterprise start) or DEMO (preset incident cases)
+ */
+gatewayRouter.post('/system/reset', (req: Request, res: Response) => {
+  try {
+    const { mode } = req.body;
+    if (mode === 'DEMO') {
+      const data = db.resetToDemo();
+      return res.json({ success: true, message: 'System restored to demo state.', counts: { sources: data.sources.length, agents: data.agents.length, models: data.models.length } });
+    } else {
+      const data = db.resetToBlank();
+      return res.json({ success: true, message: 'System reset to clean blank state.', counts: { sources: 0, agents: 0, models: 0 } });
+    }
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
