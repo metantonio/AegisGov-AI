@@ -89,9 +89,16 @@ export const DataCatalogView: React.FC<DataCatalogViewProps> = ({ sources, onRef
             </div>
 
             <div>
-              <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
-                {src.name}
-              </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
+                  {src.name}
+                </h3>
+                {src.encryptedCredentials && (
+                  <span style={{ fontSize: '0.62rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-emerald)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                    AES-256-GCM
+                  </span>
+                )}
+              </div>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
                 Origin: <b style={{ color: '#cbd5e1' }}>{src.origin}</b>
               </div>
@@ -158,8 +165,11 @@ export const DataCatalogView: React.FC<DataCatalogViewProps> = ({ sources, onRef
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>System of Origin</label>
-                <input required value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="e.g. Legal Doc Repository" />
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>System of Origin / Connection URI</label>
+                <input required value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="e.g. postgresql://user:password@db.corp:5432/crm" />
+                <span style={{ fontSize: '0.68rem', color: 'var(--accent-emerald)', marginTop: '3px', display: 'block' }}>
+                  🔒 Cryptographic Protection: Passwords inside connection URIs are masked with '***' and encrypted in the vault using AES-256-GCM.
+                </span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>

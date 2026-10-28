@@ -4,6 +4,7 @@
 [![NIST AI RMF 1.0](https://img.shields.io/badge/Framework-NIST%20AI%20RMF%201.0-purple.svg)](https://www.nist.gov/itl/ai-risk-management-framework)
 [![EU AI Act](https://img.shields.io/badge/Compliance-EU%20AI%20Act%20(2024%2F1689)-emerald.svg)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689)
 [![GDPR Compliant](https://img.shields.io/badge/Privacy-GDPR%20%2F%20RGPD-cyan.svg)](https://gdpr-info.eu/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A robust, enterprise-grade Data & AI Governance Middleware Gateway built strictly upon the principles and controls defined in the **ISO/IEC 42001 Practical Guide for Data and AI Governance**. 
 
@@ -415,3 +416,36 @@ export async function handleUserChatMessage(userId: string, userMessage: string)
 - **Regulation (EU) 2024/1689 (EU AI Act)**: Articles 9, 12, 14 (Human Oversight), and 50.
 - **Regulation (EU) 2016/679 (GDPR / RGPD)**: Articles 5 (Purpose Limitation & Minimization) and 32 (Security of Processing).
 - **DAMA-DMBOK**: Data Quality, Metadata, and Architecture practices.
+
+---
+
+## 🔐 Data Security & Cryptographic Storage Architecture
+
+To meet stringent banking and regulatory standards (ISO/IEC 42001 Cl. 8.2 & GDPR Art. 32), AegisGov AI enforces a zero-plaintext credential model across all storage layers:
+
+### 1. Irreversible Salted SHA-256 API Key Hashing
+- **Zero Plaintext Storage**: Agent API keys (`aegis_live_...`) are **never** stored in plaintext on disk or in database records.
+- **Salted Hash Generation**: Stored exclusively as one-way salted hashes (`sha256-<hash>`).
+- **Timing-Attack Resistance**: API key authentication performs constant-time buffer validation (`crypto.timingSafeEqual`) to prevent side-channel timing attacks.
+- **Display-Safe Prefixes**: The dashboard displays only non-sensitive prefixes (`apiKeyPrefix`, e.g. `aegis_live_9941...`) and a green `SHA-256 HASHED` badge.
+- **One-Time Secret Reveal**: When an agent identity is registered, the raw API key is returned strictly **once** in the HTTP response. A security modal prompts the operator to save the secret immediately, as it cannot be recovered.
+
+### 2. AES-256-GCM Secrets Vault & Connection String Masking
+- **Automatic Password Redaction**: Database connection URIs (PostgreSQL, MySQL, Snowflake, etc.) are automatically parsed on ingestion. Any embedded credentials are stripped and masked into `***` (e.g. `postgresql://user:***@host:5432/db`).
+- **Military-Grade Authenticated Encryption**: Extracted database passwords and secrets are encrypted with **AES-256-GCM** using a 96-bit initialization vector (IV) and authentication tag validation (`aes-256-gcm:iv:tag:ciphertext`).
+- **Integrity Verification**: Generates a SHA-256 `credentialsHash` to verify configuration integrity without exposing decrypted values.
+
+### 3. Automated Storage Migration & Repository Protection
+- **Automatic Legacy Migration**: Upon startup, the persistence engine scans existing records. Any legacy plaintext keys or credentials are automatically converted to salted hashes and AES-256-GCM payloads, permanently purging the plaintext versions from disk.
+- **Version Control Isolation**: The data storage directory (`data/governance_data.json`) is strictly excluded in `.gitignore` to prevent any inadvertent check-ins to source control.
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
+
+Copyright (c) 2026 **Qualex Consulting Services INC** and **Antonio Martínez**.
+
+See the full license text in the [LICENSE](file:///c:/Repositorios/governance/LICENSE) file.
+

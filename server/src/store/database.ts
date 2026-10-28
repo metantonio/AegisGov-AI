@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { cryptoService } from '../services/CryptoService.js';
 import {
   DataSource,
   AgentIdentity,
@@ -106,7 +107,8 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     allowedDataSources: ['src-airline-policy-01'],
     allowedTools: ['airline.lookup_fare_rules', 'airline.check_ticket_status'],
     environment: 'production',
-    apiKey: 'aegis_live_aircan_key_9941a7c',
+    apiKeyHash: cryptoService.hashApiKey('aegis_live_aircan_key_9941a7c'),
+    apiKeyPrefix: cryptoService.getApiKeyPrefix('aegis_live_aircan_key_9941a7c'),
     tokenExpiresAt: '2027-01-01T00:00:00Z',
     killSwitchActive: false,
     createdAt: '2026-01-10T12:00:00Z'
@@ -122,7 +124,8 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     allowedDataSources: ['src-fin-ledger-03', 'src-crm-customers-02'],
     allowedTools: ['erp.create_payment', 'financial.transfer_funds', 'erp.read_orders'],
     environment: 'production',
-    apiKey: 'aegis_live_fin_key_7718be8',
+    apiKeyHash: cryptoService.hashApiKey('aegis_live_fin_key_7718be8'),
+    apiKeyPrefix: cryptoService.getApiKeyPrefix('aegis_live_fin_key_7718be8'),
     tokenExpiresAt: '2026-12-31T23:59:59Z',
     killSwitchActive: false,
     createdAt: '2026-02-14T09:30:00Z'
@@ -138,7 +141,8 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     allowedDataSources: ['src-codebase-intel-04'],
     allowedTools: ['db.execute_migration', 'db.execute_query', 'infra.restart_service'],
     environment: 'sandbox',
-    apiKey: 'aegis_sandbox_devops_key_1192e4a',
+    apiKeyHash: cryptoService.hashApiKey('aegis_sandbox_devops_key_1192e4a'),
+    apiKeyPrefix: cryptoService.getApiKeyPrefix('aegis_sandbox_devops_key_1192e4a'),
     tokenExpiresAt: '2026-11-30T00:00:00Z',
     killSwitchActive: false,
     createdAt: '2026-03-01T15:20:00Z'
@@ -154,7 +158,8 @@ const INITIAL_AGENTS: AgentIdentity[] = [
     allowedDataSources: ['src-codebase-intel-04'],
     allowedTools: ['code.summarize', 'code.run_tests'],
     environment: 'production',
-    apiKey: 'aegis_live_samsung_copilot_5501fa3',
+    apiKeyHash: cryptoService.hashApiKey('aegis_live_samsung_copilot_5501fa3'),
+    apiKeyPrefix: cryptoService.getApiKeyPrefix('aegis_live_samsung_copilot_5501fa3'),
     tokenExpiresAt: '2026-12-31T00:00:00Z',
     killSwitchActive: false,
     createdAt: '2026-03-10T11:00:00Z'
@@ -464,7 +469,42 @@ export class GovernanceDatabase {
     if (fs.existsSync(DATA_FILE)) {
       try {
         const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-        return JSON.parse(raw);
+        const parsed: DatabaseSchema = JSON.parse(raw);
+
+        // Security Migration: Convert any legacy plaintext apiKeys to salted SHA-256 hashes
+        let migrated = false;
+        if (Array.isArray(parsed.agents)) {
+          parsed.agents = parsed.agents.map((agent: any) => {
+            if (agent.apiKey && !agent.apiKeyHash) {
+              agent.apiKeyHash = cryptoService.hashApiKey(agent.apiKey);
+              agent.apiKeyPrefix = cryptoService.getApiKeyPrefix(agent.apiKey);
+              delete agent.apiKey;
+              migrated = true;
+            }
+            return agent;
+          });
+        }
+
+        // Security Migration: Mask and encrypt any plaintext passwords in data sources
+        if (Array.isArray(parsed.sources)) {
+          parsed.sources = parsed.sources.map((source: any) => {
+            if (source.origin) {
+              const { maskedUri, extractedPassword } = cryptoService.maskConnectionString(source.origin);
+              if (extractedPassword && maskedUri !== source.origin) {
+                source.origin = maskedUri;
+                source.encryptedCredentials = cryptoService.encryptSecret(extractedPassword);
+                source.credentialsHash = cryptoService.hashSecret(extractedPassword);
+                migrated = true;
+              }
+            }
+            return source;
+          });
+        }
+
+        if (migrated) {
+          this.saveData(parsed);
+        }
+        return parsed;
       } catch (err) {
         console.error('Failed to parse database file, initializing defaults:', err);
       }
@@ -525,7 +565,7 @@ export class GovernanceDatabase {
   }
 
   getAgentByApiKey(apiKey: string): AgentIdentity | undefined {
-    return this.data.agents.find((a) => a.apiKey === apiKey);
+    return this.data.agents.find((a) => cryptoService.verifyApiKey(apiKey, a.apiKeyHash));
   }
 
   addAgent(agent: AgentIdentity): AgentIdentity {

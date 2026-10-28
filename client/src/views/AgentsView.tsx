@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Key, Plus, Power, ShieldAlert, CheckCircle, AlertTriangle, Terminal } from 'lucide-react';
+import { Key, Plus, Power, ShieldAlert, CheckCircle, AlertTriangle, Terminal, Copy, Check, Lock } from 'lucide-react';
 import { api } from '../services/api';
 
 interface AgentsViewProps {
@@ -20,6 +20,10 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
   const [allowedDataSources, setAllowedDataSources] = useState('src-airline-policy-01');
   const [loading, setLoading] = useState(false);
 
+  // One-time API key display modal
+  const [createdKeyData, setCreatedKeyData] = useState<{ name: string; rawApiKey: string } | null>(null);
+  const [copiedKey, setCopiedKey] = useState(false);
+
   const toggleKillSwitch = async (agentId: string, currentStatus: boolean) => {
     try {
       await api.setAgentKillSwitch(agentId, !currentStatus);
@@ -33,7 +37,7 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
     e.preventDefault();
     setLoading(true);
     try {
-      await api.createAgent({
+      const response = await api.createAgent({
         name,
         technicalIdentity,
         systemOwner,
@@ -51,10 +55,22 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
       setProcessOwner('');
       setAllowedDataSources('src-airline-policy-01');
       onRefresh();
+
+      if (response.rawApiKey) {
+        setCreatedKeyData({ name: response.agent.name, rawApiKey: response.rawApiKey });
+      }
     } catch (err: any) {
       alert(err.message || 'Failed to register agent');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const copyToClipboard = () => {
+    if (createdKeyData?.rawApiKey) {
+      navigator.clipboard.writeText(createdKeyData.rawApiKey);
+      setCopiedKey(true);
+      setTimeout(() => setCopiedKey(false), 3000);
     }
   };
 
@@ -188,14 +204,100 @@ export const AgentsView: React.FC<AgentsViewProps> = ({ agents, onRefresh }) => 
               </div>
             </div>
 
-            {/* Token */}
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-faint)', borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
-              <span>API Key: <code style={{ color: 'var(--accent-cyan)' }}>{agent.apiKey?.substring(0, 16)}...</code></span>
+            {/* Token / Key */}
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-faint)', borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Lock size={12} style={{ color: 'var(--accent-emerald)' }} />
+                <span>
+                  Key: <code style={{ color: 'var(--accent-cyan)' }}>{agent.apiKeyPrefix || agent.apiKey?.substring(0, 14) + '...'}</code>
+                </span>
+                <span style={{ fontSize: '0.62rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-emerald)', padding: '1px 5px', borderRadius: '3px' }}>
+                  SHA-256 HASHED
+                </span>
+              </div>
               <span>Expires: {agent.tokenExpiresAt?.split('T')[0]}</span>
             </div>
           </div>
         ))}
       </div>
+
+      {/* One-Time API Key Display Modal (Security / Compliance) */}
+      {createdKeyData && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1100
+        }}>
+          <div className="glass-panel" style={{ width: '550px', maxWidth: '90%', padding: '24px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--accent-emerald)', marginBottom: '12px' }}>
+              <CheckCircle size={22} />
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#ffffff' }}>
+                Agent Identity Created Successfully
+              </h3>
+            </div>
+
+            <p style={{ fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.4', marginBottom: '16px' }}>
+              Here is the live API key for <strong>{createdKeyData.name}</strong>.
+            </p>
+
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '8px',
+              padding: '12px',
+              marginBottom: '16px',
+              display: 'flex',
+              gap: '10px',
+              alignItems: 'flex-start'
+            }}>
+              <AlertTriangle size={18} style={{ color: '#f87171', flexShrink: 0, marginTop: '2px' }} />
+              <div style={{ fontSize: '0.78rem', color: '#fca5a5', lineHeight: '1.4' }}>
+                <strong>ISO/IEC 42001 & SOC 2 Security Notice:</strong> This key is displayed <strong>ONLY ONCE</strong>.
+                For your security, it is stored in the database exclusively as a salted SHA-256 cryptographic hash and cannot be recovered.
+              </div>
+            </div>
+
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.5)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '8px',
+              padding: '12px 14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '20px'
+            }}>
+              <code style={{ fontSize: '0.85rem', color: 'var(--accent-cyan)', fontFamily: 'var(--font-mono)', wordBreak: 'break-all' }}>
+                {createdKeyData.rawApiKey}
+              </code>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={copyToClipboard}
+                style={{ marginLeft: '12px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem' }}
+              >
+                {copiedKey ? <Check size={14} style={{ color: 'var(--accent-emerald)' }} /> : <Copy size={14} />}
+                <span>{copiedKey ? 'Copied!' : 'Copy'}</span>
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => setCreatedKeyData(null)}
+              >
+                I Have Saved My Secret Key
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Register Modal */}
       {showModal && (

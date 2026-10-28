@@ -2,6 +2,7 @@
   "name": "aegis-ai-governance-platform",
   "version": "1.0.0",
   "description": "ISO/IEC 42001 & Enterprise AI Data Governance Middleware Platform",
+  "license": "MIT",
   "scripts": {
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,cyan\" \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
     "dev:server": "npm --prefix server run dev",

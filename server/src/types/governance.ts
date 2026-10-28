@@ -25,6 +25,8 @@ export interface DataSource {
   lastUpdated: string;
   contentHash: string;
   sampleContent?: string;
+  encryptedCredentials?: string;
+  credentialsHash?: string;
 }
 
 export interface AgentIdentity {
@@ -38,10 +40,12 @@ export interface AgentIdentity {
   allowedDataSources: string[];
   allowedTools: string[];
   environment: EnvironmentType;
-  apiKey: string;
+  apiKeyHash: string;
+  apiKeyPrefix: string;
   tokenExpiresAt: string;
   killSwitchActive: boolean;
   createdAt: string;
+  rawApiKey?: string;
 }
 
 export interface ActionPolicy {

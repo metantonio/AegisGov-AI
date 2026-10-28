@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'node:crypto';
 import { db } from '../store/database.js';
+import { cryptoService } from '../services/CryptoService.js';
 import { AgentIdentity } from '../types/governance.js';
 
 export const agentsRouter = Router();
@@ -25,7 +26,9 @@ agentsRouter.post('/', (req: Request, res: Response) => {
   }
 
   const id = `agent-${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString().slice(-4)}`;
-  const apiKey = `aegis_live_${crypto.randomBytes(8).toString('hex')}`;
+  const rawApiKey = `aegis_live_${crypto.randomBytes(16).toString('hex')}`;
+  const apiKeyHash = cryptoService.hashApiKey(rawApiKey);
+  const apiKeyPrefix = cryptoService.getApiKeyPrefix(rawApiKey);
   const tokenExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 
   const newAgent: AgentIdentity = {
@@ -39,14 +42,19 @@ agentsRouter.post('/', (req: Request, res: Response) => {
     allowedDataSources: allowedDataSources || [],
     allowedTools: allowedTools || [],
     environment: environment || 'sandbox',
-    apiKey,
+    apiKeyHash,
+    apiKeyPrefix,
     tokenExpiresAt,
     killSwitchActive: false,
     createdAt: new Date().toISOString()
   };
 
   db.addAgent(newAgent);
-  return res.status(201).json({ agent: newAgent });
+  return res.status(201).json({
+    agent: newAgent,
+    rawApiKey,
+    notice: 'SAVE THIS KEY NOW: For compliance (ISO/IEC 42001 & SOC 2), API keys are stored only as one-way cryptographic SHA-256 hashes and cannot be retrieved later.'
+  });
 });
 
 agentsRouter.patch('/:id/kill-switch', (req: Request, res: Response) => {
